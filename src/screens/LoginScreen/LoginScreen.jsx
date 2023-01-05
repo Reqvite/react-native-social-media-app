@@ -15,12 +15,10 @@ import {
 
 import * as Font from "expo-font";
 
-export default function RegistrationScreen() {
-  const [inputLoginBgColor, setInputLoginBgColor] = useState("#F8F8F8");
+export default function LoginScreen() {
   const [inputEmailBgColor, setInputEmailBgColor] = useState("#F8F8F8");
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
 
-  const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -64,8 +62,8 @@ export default function RegistrationScreen() {
     Keyboard.dismiss();
   };
 
-  const handleRegistration = () => {
-    Alert.alert("Credentials", `${login} + ${email} + ${password}`);
+  const handleLogin = () => {
+    Alert.alert("Credentials", `${email} + ${password}`);
   };
 
   return (
@@ -79,17 +77,8 @@ export default function RegistrationScreen() {
           style={styles.image}
         >
           <View style={styles.registrationBox}>
-            <View style={styles.photoBox}></View>
-            <Text style={styles.title}>Sign Up</Text>
+            <Text style={styles.title}>Login</Text>
             <View style={styles.form}>
-              <TextInput
-                placeholder="Login"
-                style={[styles.input, { borderColor: inputLoginBgColor }]}
-                onChangeText={(text) => setLogin(text)}
-                onFocus={() => setInputLoginBgColor("#FF6C00")}
-                onBlur={() => setInputLoginBgColor("#F8F8F8")}
-                textAlign={"center"}
-              />
               <TextInput
                 placeholder="Email"
                 style={[styles.input, { borderColor: inputEmailBgColor }]}
@@ -119,10 +108,10 @@ export default function RegistrationScreen() {
                     style={styles.btn}
                     onPress={handleRegistration}
                   >
-                    <Text style={styles.btnTitle}>Sign Up</Text>
+                    <Text style={styles.btnTitle}>Login</Text>
                   </TouchableOpacity>
                   <Text style={styles.link}>
-                    Already have an account? Log in
+                    Don't have an account? Sign Up
                   </Text>
                 </View>
               )}
@@ -145,21 +134,13 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   registrationBox: {
-    flex: 0.75,
+    flex: 0.5,
     position: "relative",
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-  },
-  photoBox: {
-    position: "absolute",
-    top: -60,
-    height: 120,
-    width: 120,
-    borderRadius: 16,
-    backgroundColor: "#F6F6F6",
   },
   form: {
     width: "100%",
@@ -193,11 +174,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     ...Platform.select({
       ios: {
-        backgroundColor: "#4169e2",
+        backgroundColor: "#FF6C00",
         borderColor: "#f0f8ff",
       },
       android: {
-        backgroundColor: "#4169e1",
+        backgroundColor: "#FF6C00",
         borderColor: "transparent",
       },
     }),
