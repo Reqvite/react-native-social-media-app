@@ -3,7 +3,7 @@
     "name": "react-native-pr",
     "slug": "react-native-pr",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -28,6 +28,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7ba8e534-6ba9-473f-b81f-7f769ce943b0"
+      }
+    },
+    "owner": "reqvite"
   }
 }
