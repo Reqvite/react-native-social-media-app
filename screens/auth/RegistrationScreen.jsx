@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   ImageBackground,
@@ -11,22 +11,19 @@ import {
   Keyboard,
   TouchableOpacity,
   Alert,
+  Button,
 } from "react-native";
 
-import * as Font from "expo-font";
-
-export default function LoginScreen() {
+export default function RegistrationScreen({ navigation }) {
+  const [inputLoginBgColor, setInputLoginBgColor] = useState("#F8F8F8");
   const [inputEmailBgColor, setInputEmailBgColor] = useState("#F8F8F8");
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
 
+  const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [fontsLoaded] = Font.useFonts({
-    "Montserrat-Bold": require("./assets/fonts/Montserrat-Bold.ttf"),
-    "Montserrat-Regular": require("./assets/fonts/Montserrat-Regular.ttf"),
-  });
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -48,22 +45,12 @@ export default function LoginScreen() {
     };
   }, []);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
   const handleKeyboard = () => {
     Keyboard.dismiss();
   };
 
-  const handleLogin = () => {
-    Alert.alert("Credentials", `${email} + ${password}`);
+  const handleRegistration = () => {
+    Alert.alert("Credentials", `${login} + ${email} + ${password}`);
   };
 
   return (
@@ -73,12 +60,21 @@ export default function LoginScreen() {
         style={styles.container}
       >
         <ImageBackground
-          source={require("./src/images/Photo_BG.jpg")}
+          source={require("../../assets/images/Photo_BG.jpg")}
           style={styles.image}
         >
           <View style={styles.registrationBox}>
-            <Text style={styles.title}>Login</Text>
+            <View style={styles.photoBox}></View>
+            <Text style={styles.title}>Sign Up</Text>
             <View style={styles.form}>
+              <TextInput
+                placeholder="Login"
+                style={[styles.input, { borderColor: inputLoginBgColor }]}
+                onChangeText={(text) => setLogin(text)}
+                onFocus={() => setInputLoginBgColor("#FF6C00")}
+                onBlur={() => setInputLoginBgColor("#F8F8F8")}
+                textAlign={"center"}
+              />
               <TextInput
                 placeholder="Email"
                 style={[styles.input, { borderColor: inputEmailBgColor }]}
@@ -97,22 +93,23 @@ export default function LoginScreen() {
                 textAlign={"center"}
               />
               {!isKeyboardVisible && (
-                <View
-                // style={{
-                //   position: isKeyboardVisible ? "absolute" : "relative",
-                //   bottom: isKeyboardVisible ? -150 : 0,
-                // }}
-                >
+                <View>
                   <TouchableOpacity
                     activeOpacity={0.8}
                     style={styles.btn}
                     onPress={handleRegistration}
                   >
-                    <Text style={styles.btnTitle}>Login</Text>
+                    <Text style={styles.btnTitle}>Sign Up</Text>
                   </TouchableOpacity>
-                  <Text style={styles.link}>
-                    Don't have an account? Sign Up
-                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.link}
+                    onPress={() => navigation.navigate("Login")}
+                  >
+                    <Text style={styles.linkText}>
+                      Already have an account? Log in
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               )}
             </View>
@@ -134,13 +131,21 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   registrationBox: {
-    flex: 0.5,
+    flex: 0.75,
     position: "relative",
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     justifyContent: "center",
     alignItems: "center",
+  },
+  photoBox: {
+    position: "absolute",
+    top: -60,
+    height: 120,
+    width: 120,
+    borderRadius: 16,
+    backgroundColor: "#F6F6F6",
   },
   form: {
     width: "100%",
@@ -188,8 +193,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   link: {
+    backgroundColor: "transparent",
     marginTop: 15,
     fontSize: 18,
     textAlign: "center",
+  },
+  linkText: {
+    textAlign: "center",
+    color: "#1B4371",
+    fontSize: 18,
   },
 });
