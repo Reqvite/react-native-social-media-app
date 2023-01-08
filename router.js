@@ -7,7 +7,7 @@ import LoginScreen from "./screens/auth/LoginScreen";
 import RegistrationScreen from "./screens/auth/RegistrationScreen";
 
 import ProfileScreen from "./screens/mainScreen/ProfileScreen";
-import PostScreen from "./screens/mainScreen/PostScreen";
+import PostsScreen from "./screens/mainScreen/PostsScreen";
 import CreatePostScreen from "./screens/mainScreen/CreatePostScreen";
 
 const AuthStack = createStackNavigator();
@@ -38,7 +38,7 @@ export const useRoute = (isAuth) => {
     <MainTab.Navigator screenOptions={{ tabBarShowLabel: false }}>
       <MainTab.Screen
         name="Post"
-        component={CreatePostScreen}
+        component={PostsScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <MaterialIcons name="dynamic-feed" size={size} color={color} />
@@ -49,7 +49,7 @@ export const useRoute = (isAuth) => {
       />
       <MainTab.Screen
         name="CreatePost"
-        component={PostScreen}
+        component={CreatePostScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <MaterialIcons name="post-add" size={32} color={color} />
