@@ -5,7 +5,11 @@ export const posts = [
     title: "Andromeda",
     likes: 232,
     comments: 22,
-    location: "Ivano-Frankivs'k Region, Ukraine",
+    photoLocation: {
+      latitude: 37.4217937,
+      longitude: -122.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
     id: "1",
   },
   {
@@ -13,7 +17,11 @@ export const posts = [
     title: "Milky Way",
     likes: 232,
     comments: 32,
-    location: "Ivano-Frankivs'k Region, Ukraine",
+    photoLocation: {
+      latitude: 31.4217937,
+      longitude: -144.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
     id: "2",
   },
   {
@@ -22,7 +30,11 @@ export const posts = [
     title: "Halley's comet",
     likes: 232,
     comments: 100,
-    location: "Ivano-Frankivs'k Region, Ukraine",
+    photoLocation: {
+      latitude: 40.4217937,
+      longitude: -122.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
     id: "3",
   },
   {
@@ -31,7 +43,11 @@ export const posts = [
     title: "Andromeda",
     likes: 232,
     comments: 22,
-    location: "Ivano-Frankivs'k Region, Ukraine",
+    photoLocation: {
+      latitude: 33.4217937,
+      longitude: -110.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
     id: "4",
   },
   {
@@ -39,7 +55,11 @@ export const posts = [
     title: "Milky Way",
     likes: 232,
     comments: 32,
-    location: "Ivano-Frankivs'k Region, Ukraine",
+    photoLocation: {
+      latitude: 10.4217937,
+      longitude: -110.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
     id: "5",
   },
   {
@@ -48,7 +68,11 @@ export const posts = [
     title: "Halley's comet",
     likes: 232,
     comments: 100,
-    location: "Ivano-Frankivs'k Region, Ukraine",
+    photoLocation: {
+      latitude: 100.4217937,
+      longitude: -110.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
     id: "6",
   },
   {
@@ -57,7 +81,11 @@ export const posts = [
     title: "Andromeda",
     likes: 232,
     comments: 22,
-    location: "Ivano-Frankivs'k Region, Ukraine",
+    photoLocation: {
+      latitude: 50.4217937,
+      longitude: -110.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
     id: "7",
   },
   {
@@ -65,7 +93,11 @@ export const posts = [
     title: "Milky Way",
     likes: 232,
     comments: 32,
-    location: "Ivano-Frankivs'k Region, Ukraine",
+    photoLocation: {
+      latitude: 90.4217937,
+      longitude: -90.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
     id: "8",
   },
   {
@@ -74,7 +106,11 @@ export const posts = [
     title: "Halley's comet",
     likes: 232,
     comments: 100,
-    location: "Ivano-Frankivs'k Region, Ukraine",
-    id: "",
+    photoLocation: {
+      latitude: 33.4217937,
+      longitude: -22.083922,
+    },
+    inputLocation: "Ivano-Frankivs'k Region, Ukraine",
+    id: "9",
   },
 ];

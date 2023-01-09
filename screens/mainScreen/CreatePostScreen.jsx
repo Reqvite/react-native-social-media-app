@@ -34,6 +34,7 @@ const CreatPostScreen = ({ navigation }) => {
   const [type, setType] = useState(Camera.Constants.Type.back);
 
   const [location, setLocation] = useState(null);
+  const [inputLocation, setInputLocation] = useState("");
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -74,7 +75,6 @@ const CreatPostScreen = ({ navigation }) => {
 
   const handleKeyboard = () => {
     Keyboard.dismiss();
-    console.log(location);
   };
 
   const takePic = async () => {
@@ -100,6 +100,17 @@ const CreatPostScreen = ({ navigation }) => {
       setPhoto(undefined);
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
+
+      let latitude = location?.coords.latitude;
+      let longitude = location?.coords.longitude;
+
+      const geoCode = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+
+      let fullLocation = `${geoCode[0].city},${geoCode[0].country}`;
+      setInputLocation(fullLocation);
     };
 
     const savePhoto = () => {
@@ -130,15 +141,24 @@ const CreatPostScreen = ({ navigation }) => {
 
   const deletePhoto = () => setPostPhoto("");
 
-  const sendPhoto = () => {
+  const sendPhoto = async () => {
     let photo = postPhoto;
-    navigation.navigate("Post", {
+    let latitude = location?.coords.latitude;
+    let longitude = location?.coords.longitude;
+
+    const geoCode = await Location.reverseGeocodeAsync({
+      latitude,
+      longitude,
+    });
+
+    navigation.navigate("DefaultScreen", {
       photo,
       title,
       likes: 232,
       comments: 22,
-      location: "Ivano-Frankivs'k Region, Ukraine",
-      id: "22",
+      photoLocation: { latitude, longitude },
+      inputLocation,
+      id: Math.random(),
     });
   };
 
@@ -183,6 +203,8 @@ const CreatPostScreen = ({ navigation }) => {
                 inlineImageLeft="search_icon"
                 placeholder="Location..."
                 style={styles.input}
+                value={inputLocation}
+                onChangeText={(text) => setInputLocation(text)}
               />
             </View>
             <TouchableOpacity

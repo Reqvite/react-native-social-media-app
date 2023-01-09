@@ -1,5 +1,4 @@
 import React from "react";
-import { moduleName } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import DefaultPostsScreen from "../NestedScreen/DefaultScreen";
 // import CommentsScreen from "../NestedScreen/CommentsScreen";
@@ -13,6 +12,9 @@ const PostsScreen = () => {
       <NestedScreen.Screen
         name="DefaultScreen"
         component={DefaultPostsScreen}
+        options={{
+          headerShown: false,
+        }}
       />
       {/* <NestedScreen.Screen name="Comments" component={CommentsScreen} /> */}
       <NestedScreen.Screen name="Map" component={MapScreen} />

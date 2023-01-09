@@ -22,6 +22,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     if (route.params) {
+      console.log(route.params);
       setAllPosts((prevSt) => [...prevSt, route.params].reverse());
     }
   }, [route.params]);
