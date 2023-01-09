@@ -11,7 +11,7 @@ export default function App() {
     "Montserrat-Regular": require("./assets/fonts/Montserrat-Regular.ttf"),
   });
 
-  const routing = useRoute(null);
+  const routing = useRoute(true);
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();

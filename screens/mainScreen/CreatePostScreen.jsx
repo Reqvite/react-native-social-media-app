@@ -1,5 +1,6 @@
 import { EvilIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import {
   View,
@@ -9,13 +10,90 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  SafeAreaView,
+  Image,
+  ImageBackground,
+  Button,
 } from "react-native";
 
+import { Camera, CameraType } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
+import { shareAsync } from "expo-sharing";
+
+import { useEffect, useRef, useState } from "react";
+
 const CreatPostScreen = () => {
+  let cameraRef = useRef(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState();
+  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
+  const [photo, setPhoto] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState("");
+  const [type, setType] = useState(Camera.Constants.Type.back);
+
+  useEffect(() => {
+    (async () => {
+      const cameraPermission = await Camera.requestCameraPermissionsAsync();
+      const mediaLibraryPermission =
+        await MediaLibrary.requestPermissionsAsync();
+      setHasPermission(cameraPermission.status === "granted");
+      setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
+    })();
+  }, []);
+
+  if (hasCameraPermission === null) {
+    return <View />;
+  }
+  if (hasCameraPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
   const handleKeyboard = () => {
     Keyboard.dismiss();
   };
 
+  const takePic = async () => {
+    let options = {
+      quality: 1,
+      base64: true,
+      exif: false,
+    };
+
+    let newPhoto = await cameraRef.current.takePictureAsync(options);
+    setPhoto(newPhoto);
+  };
+
+  if (photo) {
+    console.log(photo);
+    const sharePic = () => {
+      shareAsync(photo.uri).then(() => {
+        setPhoto(undefined);
+      });
+    };
+
+    const setNewProfilePhoto = () => {
+      setProfilePhoto(photo.uri);
+      setPhoto(undefined);
+    };
+
+    let savePhoto = () => {
+      MediaLibrary.saveToLibraryAsync(photo.uri).then(() => {
+        setPhoto(undefined);
+      });
+    };
+
+    return (
+      <SafeAreaView>
+        <Image
+          style={styles.preview}
+          source={{ url: "data:image/jpg;base64," + photo.base64 }}
+        />
+        <Button title="Set Photo" onPress={setNewProfilePhoto} />
+        <Button title="Share" onPress={sharePic} />
+        <Button title="Save" onPress={savePhoto} />
+        <Button title="Discard" onPress={() => setPhoto(undefined)} />
+      </SafeAreaView>
+    );
+  }
   return (
     <TouchableWithoutFeedback onPress={handleKeyboard}>
       <View
@@ -26,8 +104,31 @@ const CreatPostScreen = () => {
           <Text style={styles.title}>Create Post</Text>
         </View>
         <View style={styles.bottomBox}>
-          <View style={styles.imageLoader}></View>
-          <Text style={styles.photoInfo}>Upload photo</Text>
+          <View style={styles.imageLoader}>
+            <ImageBackground
+              style={styles.backgroundImg}
+              source={{ uri: profilePhoto }}
+            >
+              <Camera style={styles.camera} ref={cameraRef} type={type} />
+            </ImageBackground>
+          </View>
+          <View style={styles.uploadPhotoBox}>
+            <Text style={styles.photoInfo}>Upload photo</Text>
+            <TouchableOpacity
+              onPress={() => {
+                setType(
+                  type === Camera.Constants.Type.back
+                    ? Camera.Constants.Type.front
+                    : Camera.Constants.Type.back
+                );
+              }}
+            >
+              <Text style={styles.flipBtn}>Flip</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cameraBtn} onPress={takePic}>
+              <FontAwesome5 name="camera" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
           <View style={styles.form}>
             <TextInput placeholder="Title..." style={styles.inputTitle} />
             <View style={styles.inputPosition}>
@@ -85,9 +186,44 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 8,
   },
+  backgroundImage: {
+    flex: 1,
+    justifyContent: "flex-end",
+    resizeMode: "cover",
+    backgroundColor: "red",
+  },
+  camera: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: -1,
+  },
+  uploadPhotoBox: {
+    marginTop: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  preview: {
+    width: "100%",
+    height: 500,
+  },
+  flipBtn: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: "black",
+  },
+  cameraBtn: {
+    width: 60,
+    height: 60,
+    borderRadius: 50,
+    backgroundColor: "rgba(182, 178, 178, 0.904)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   photoInfo: {
     fontFamily: "Montserrat-Regular",
-    marginTop: 8,
   },
   form: {
     marginTop: 32,
