@@ -1,6 +1,13 @@
 import { EvilIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
+
+import { Camera } from "expo-camera";
+
+import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
+import * as Location from "expo-location";
+
+import { shareAsync } from "expo-sharing";
 
 import {
   View,
@@ -10,33 +17,51 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  SafeAreaView,
-  Image,
   ImageBackground,
-  Button,
 } from "react-native";
 
-import { Camera, CameraType } from "expo-camera";
-import * as MediaLibrary from "expo-media-library";
-import { shareAsync } from "expo-sharing";
-
 import { useEffect, useRef, useState } from "react";
+import { CameraOptions } from "../../components/CameraOptions";
+import { CameraButtons } from "../../components/CameraButtons";
 
-const CreatPostScreen = () => {
+const CreatPostScreen = ({ navigation }) => {
   let cameraRef = useRef(null);
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [photo, setPhoto] = useState(null);
-  const [profilePhoto, setProfilePhoto] = useState("");
+  const [postPhoto, setPostPhoto] = useState("");
+  const [title, setTitle] = useState("");
   const [type, setType] = useState(Camera.Constants.Type.back);
+
+  const [location, setLocation] = useState(null);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setPostPhoto(result.assets[0].uri);
+    }
+  };
 
   useEffect(() => {
     (async () => {
       const cameraPermission = await Camera.requestCameraPermissionsAsync();
       const mediaLibraryPermission =
         await MediaLibrary.requestPermissionsAsync();
+
+      let { status } = await Location.requestForegroundPermissionsAsync();
       setHasPermission(cameraPermission.status === "granted");
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
+
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
     })();
   }, []);
 
@@ -49,6 +74,7 @@ const CreatPostScreen = () => {
 
   const handleKeyboard = () => {
     Keyboard.dismiss();
+    console.log(location);
   };
 
   const takePic = async () => {
@@ -63,37 +89,59 @@ const CreatPostScreen = () => {
   };
 
   if (photo) {
-    console.log(photo);
     const sharePic = () => {
       shareAsync(photo.uri).then(() => {
         setPhoto(undefined);
       });
     };
 
-    const setNewProfilePhoto = () => {
-      setProfilePhoto(photo.uri);
+    const setNewPostPhoto = async () => {
+      setPostPhoto(photo.uri);
       setPhoto(undefined);
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
     };
 
-    let savePhoto = () => {
+    const savePhoto = () => {
       MediaLibrary.saveToLibraryAsync(photo.uri).then(() => {
         setPhoto(undefined);
       });
     };
 
+    const discard = () => setPhoto(undefined);
+
     return (
-      <SafeAreaView>
-        <Image
-          style={styles.preview}
-          source={{ url: "data:image/jpg;base64," + photo.base64 }}
-        />
-        <Button title="Set Photo" onPress={setNewProfilePhoto} />
-        <Button title="Share" onPress={sharePic} />
-        <Button title="Save" onPress={savePhoto} />
-        <Button title="Discard" onPress={() => setPhoto(undefined)} />
-      </SafeAreaView>
+      <CameraOptions
+        photo={photo.base64}
+        setNewPostPhoto={setNewPostPhoto}
+        sharePic={sharePic}
+        savePhoto={savePhoto}
+        discard={discard}
+      />
     );
   }
+
+  const handleTypeOfCamera = () =>
+    setType(
+      type === Camera.Constants.Type.back
+        ? Camera.Constants.Type.front
+        : Camera.Constants.Type.back
+    );
+
+  const deletePhoto = () => setPostPhoto("");
+
+  const sendPhoto = () => {
+    let photo = postPhoto;
+    navigation.navigate("Post", {
+      photo,
+      title,
+      likes: 232,
+      comments: 22,
+      location: "Ivano-Frankivs'k Region, Ukraine",
+      id: "22",
+    });
+  };
+
   return (
     <TouchableWithoutFeedback onPress={handleKeyboard}>
       <View
@@ -107,30 +155,23 @@ const CreatPostScreen = () => {
           <View style={styles.imageLoader}>
             <ImageBackground
               style={styles.backgroundImg}
-              source={{ uri: profilePhoto }}
+              source={{ uri: postPhoto }}
             >
               <Camera style={styles.camera} ref={cameraRef} type={type} />
+              <CameraButtons
+                pickImage={pickImage}
+                handleTypeOfCamera={handleTypeOfCamera}
+                deletePhoto={deletePhoto}
+                takePic={takePic}
+              />
             </ImageBackground>
           </View>
-          <View style={styles.uploadPhotoBox}>
-            <Text style={styles.photoInfo}>Upload photo</Text>
-            <TouchableOpacity
-              onPress={() => {
-                setType(
-                  type === Camera.Constants.Type.back
-                    ? Camera.Constants.Type.front
-                    : Camera.Constants.Type.back
-                );
-              }}
-            >
-              <Text style={styles.flipBtn}>Flip</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.cameraBtn} onPress={takePic}>
-              <FontAwesome5 name="camera" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
           <View style={styles.form}>
-            <TextInput placeholder="Title..." style={styles.inputTitle} />
+            <TextInput
+              placeholder="Title..."
+              style={styles.inputTitle}
+              onChangeText={(text) => setTitle(text)}
+            />
             <View style={styles.inputPosition}>
               <EvilIcons
                 style={styles.inputIcon}
@@ -144,7 +185,11 @@ const CreatPostScreen = () => {
                 style={styles.input}
               />
             </View>
-            <TouchableOpacity activeOpacity={0.8} style={styles.btn}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.btn}
+              onPress={sendPhoto}
+            >
               <Text style={styles.btnTitle}>Publish</Text>
             </TouchableOpacity>
           </View>
@@ -181,8 +226,8 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   imageLoader: {
-    width: 343,
-    height: 240,
+    width: 344,
+    height: 300,
     backgroundColor: "#F6F6F6",
     borderRadius: 8,
   },
@@ -193,40 +238,13 @@ const styles = StyleSheet.create({
     backgroundColor: "red",
   },
   camera: {
+    position: "relative",
     width: "100%",
     height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
     zIndex: -1,
   },
-  uploadPhotoBox: {
-    marginTop: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  preview: {
-    width: "100%",
-    height: 500,
-  },
-  flipBtn: {
-    fontSize: 18,
-    marginBottom: 10,
-    color: "black",
-  },
-  cameraBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 50,
-    backgroundColor: "rgba(182, 178, 178, 0.904)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  photoInfo: {
-    fontFamily: "Montserrat-Regular",
-  },
   form: {
-    marginTop: 32,
+    marginTop: 0,
   },
   inputTitle: {
     fontFamily: "Montserrat-Bold",
