@@ -11,17 +11,24 @@ import {
   Keyboard,
   TouchableOpacity,
   Alert,
-  Button,
 } from "react-native";
+
+import { useDispatch } from "react-redux";
+
+import { authSignInUser } from "../../redux/auth/authOperations";
+
+const initialState = {
+  email: "",
+  password: "",
+};
 
 export default function LoginScreen({ navigation }) {
   const [inputEmailBgColor, setInputEmailBgColor] = useState("#F8F8F8");
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  const [state, setState] = useState(initialState);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -48,7 +55,9 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleLogin = () => {
-    Alert.alert("Credentials", `${email} + ${password}`);
+    dispatch(authSignInUser(state));
+    console.log(state);
+        setState(initialState);
   };
 
   return (
@@ -67,7 +76,10 @@ export default function LoginScreen({ navigation }) {
               <TextInput
                 placeholder="Email"
                 style={[styles.input, { borderColor: inputEmailBgColor }]}
-                onChangeText={(text) => setEmail(text)}
+                value={state.email}
+                onChangeText={(value) =>
+                  setState((prevState) => ({ ...prevState, email: value }))
+                }
                 onFocus={() => setInputEmailBgColor("#FF6C00")}
                 onBlur={() => setInputEmailBgColor("#F8F8F8")}
                 textAlign={"center"}
@@ -76,7 +88,10 @@ export default function LoginScreen({ navigation }) {
                 placeholder="Password"
                 secureTextEntry={true}
                 style={[styles.input, { borderColor: inputPasswordBgColor }]}
-                onChangeText={(text) => setPassword(text)}
+                value={state.password}
+                onChangeText={(value) =>
+                  setState((prevState) => ({ ...prevState, password: value }))
+                }
                 onFocus={() => setInputPasswordBgColor("#FF6C00")}
                 onBlur={() => setInputPasswordBgColor("#F8F8F8")}
                 textAlign={"center"}

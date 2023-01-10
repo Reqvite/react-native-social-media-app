@@ -8,11 +8,13 @@ import {
   Image,
   SafeAreaView,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
 
 import { PublicationsPost } from "../../components/PublicationsPost";
 
 import { posts } from "../../data/posts";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 
 const DefaultPostsScreen = ({ route, navigation }) => {
   const [allPosts, setAllPosts] = useState([...posts]);
@@ -30,12 +32,18 @@ const DefaultPostsScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <View style={styles.topBox}>
         <Text style={styles.title}>Publications</Text>
-        <MaterialIcons
-          style={styles.logoutIcon}
-          name="logout"
-          size={24}
-          color="#BDBDBD"
-        />
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.link}
+          onPress={() => authSignOutUser()}
+        >
+          <MaterialIcons
+            style={styles.logoutIcon}
+            name="logout"
+            size={24}
+            color="#BDBDBD"
+          />
+        </TouchableOpacity>
       </View>
       <SafeAreaView style={styles.bottomBox}>
         <View style={styles.userBox}>

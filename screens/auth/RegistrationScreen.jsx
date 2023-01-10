@@ -60,6 +60,7 @@ export default function RegistrationScreen({ navigation }) {
   const handleRegistration = () => {
     console.log(state);
     dispatch(authSignUpUser(state));
+    setState(initialState);
   };
 
   return (
