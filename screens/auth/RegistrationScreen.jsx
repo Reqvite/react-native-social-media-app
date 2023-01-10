@@ -11,17 +11,25 @@ import {
   Keyboard,
   TouchableOpacity,
   Alert,
-  Button,
 } from "react-native";
+
+import { useDispatch } from "react-redux";
+
+import { authSignUpUser } from "../../redux/auth/authOperations";
+
+const initialState = {
+  nickname: "",
+  email: "",
+  password: "",
+};
 
 export default function RegistrationScreen({ navigation }) {
   const [inputLoginBgColor, setInputLoginBgColor] = useState("#F8F8F8");
   const [inputEmailBgColor, setInputEmailBgColor] = useState("#F8F8F8");
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
 
-  const [login, setLogin] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [state, setState] = useState(initialState);
+  const dispatch = useDispatch();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -50,7 +58,8 @@ export default function RegistrationScreen({ navigation }) {
   };
 
   const handleRegistration = () => {
-    Alert.alert("Credentials", `${login} + ${email} + ${password}`);
+    console.log(state);
+    dispatch(authSignUpUser(state));
   };
 
   return (
@@ -70,7 +79,10 @@ export default function RegistrationScreen({ navigation }) {
               <TextInput
                 placeholder="Login"
                 style={[styles.input, { borderColor: inputLoginBgColor }]}
-                onChangeText={(text) => setLogin(text)}
+                value={state.nickname}
+                onChangeText={(value) =>
+                  setState((prevState) => ({ ...prevState, nickname: value }))
+                }
                 onFocus={() => setInputLoginBgColor("#FF6C00")}
                 onBlur={() => setInputLoginBgColor("#F8F8F8")}
                 textAlign={"center"}
@@ -78,7 +90,10 @@ export default function RegistrationScreen({ navigation }) {
               <TextInput
                 placeholder="Email"
                 style={[styles.input, { borderColor: inputEmailBgColor }]}
-                onChangeText={(text) => setEmail(text)}
+                value={state.email}
+                onChangeText={(value) =>
+                  setState((prevState) => ({ ...prevState, email: value }))
+                }
                 onFocus={() => setInputEmailBgColor("#FF6C00")}
                 onBlur={() => setInputEmailBgColor("#F8F8F8")}
                 textAlign={"center"}
@@ -87,7 +102,10 @@ export default function RegistrationScreen({ navigation }) {
                 placeholder="Password"
                 secureTextEntry={true}
                 style={[styles.input, { borderColor: inputPasswordBgColor }]}
-                onChangeText={(text) => setPassword(text)}
+                value={state.password}
+                onChangeText={(value) =>
+                  setState((prevState) => ({ ...prevState, password: value }))
+                }
                 onFocus={() => setInputPasswordBgColor("#FF6C00")}
                 onBlur={() => setInputPasswordBgColor("#F8F8F8")}
                 textAlign={"center"}
