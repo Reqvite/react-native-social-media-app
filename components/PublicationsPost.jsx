@@ -14,10 +14,14 @@ export const PublicationsPost = ({ item, navigation }) => {
       />
       <Text style={styles.title}>{title}</Text>
       <View style={styles.informationBox}>
-        <View style={styles.spanBox}>
+        <TouchableOpacity
+          style={styles.spanBox}
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate("Comments")}
+        >
           <EvilIcons name="comment" size={24} color="black" />
           <Text>{comments}</Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.spanBox}>
           <EvilIcons name="location" size={24} color="black" />
           <TouchableOpacity

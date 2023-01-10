@@ -9,6 +9,8 @@ import * as Location from "expo-location";
 
 import { shareAsync } from "expo-sharing";
 
+import uuid from "react-native-uuid";
+
 import {
   View,
   Text,
@@ -36,6 +38,8 @@ const CreatPostScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [inputLocation, setInputLocation] = useState("");
 
+  const [buttonBgColor, setButtonBgColorBgColor] = useState("#F8F8F8");
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -56,15 +60,23 @@ const CreatPostScreen = ({ navigation }) => {
         await MediaLibrary.requestPermissionsAsync();
 
       let { status } = await Location.requestForegroundPermissionsAsync();
-      setHasPermission(cameraPermission.status === "granted");
+      setHasCameraPermission(cameraPermission.status === "granted");
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
 
       if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
         return;
       }
+      if (
+        postPhoto.length !== 0 &&
+        title.length !== 0 &&
+        inputLocation.length !== 0
+      ) {
+        setButtonBgColorBgColor("#FF6C00");
+      } else {
+        setButtonBgColorBgColor("#F8F8F8");
+      }
     })();
-  }, []);
+  }, [postPhoto, title, inputLocation]);
 
   if (hasCameraPermission === null) {
     return <View />;
@@ -142,24 +154,38 @@ const CreatPostScreen = ({ navigation }) => {
   const deletePhoto = () => setPostPhoto("");
 
   const sendPhoto = async () => {
-    let photo = postPhoto;
-    let latitude = location?.coords.latitude;
-    let longitude = location?.coords.longitude;
+    if (
+      postPhoto.length !== 0 &&
+      title.length !== 0 &&
+      inputLocation.length !== 0
+    ) {
+      let photo = postPhoto;
 
-    const geoCode = await Location.reverseGeocodeAsync({
-      latitude,
-      longitude,
-    });
+      let address = await Location.geocodeAsync(inputLocation);
 
-    navigation.navigate("DefaultScreen", {
-      photo,
-      title,
-      likes: 232,
-      comments: 22,
-      photoLocation: { latitude, longitude },
-      inputLocation,
-      id: Math.random(),
-    });
+      let latitude = address[0]?.latitude;
+      let longitude = address[0]?.longitude;
+
+      navigation.navigate("Publications", {
+        photo,
+        title,
+        likes: 232,
+        comments: 22,
+        photoLocation: { latitude, longitude },
+        inputLocation,
+        id: uuid.v4(),
+      });
+      clearPost();
+    }
+    return;
+  };
+
+  const clearPost = () => {
+    setLocation("");
+    setTitle("");
+    setInputLocation("");
+    setPostPhoto("");
+    setButtonBgColorBgColor("#F8F8F8");
   };
 
   return (
@@ -190,6 +216,7 @@ const CreatPostScreen = ({ navigation }) => {
             <TextInput
               placeholder="Title..."
               style={styles.inputTitle}
+              value={title}
               onChangeText={(text) => setTitle(text)}
             />
             <View style={styles.inputPosition}>
@@ -209,13 +236,17 @@ const CreatPostScreen = ({ navigation }) => {
             </View>
             <TouchableOpacity
               activeOpacity={0.8}
-              style={styles.btn}
+              style={[styles.btn, { backgroundColor: buttonBgColor }]}
               onPress={sendPhoto}
             >
               <Text style={styles.btnTitle}>Publish</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity activeOpacity={0.8} style={styles.deleteBtn}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.deleteBtn}
+            onPress={clearPost}
+          >
             <AntDesign name="delete" size={24} color="black" />
           </TouchableOpacity>
         </View>
