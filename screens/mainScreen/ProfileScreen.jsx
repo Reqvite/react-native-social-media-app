@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 
 const ProfileScreen = () => {
   const userId = useSelector((state) => state.auth.userId);
+  console.log(userId);
   const getPosts = async () => {
     const q = query(collection(db, "posts"), where("userId", "==", userId));
 
