@@ -10,6 +10,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
+import { useDispatch } from "react-redux";
 
 import { PublicationsPost } from "../../components/PublicationsPost";
 
@@ -18,10 +19,16 @@ import { authSignOutUser } from "../../redux/auth/authOperations";
 
 const DefaultPostsScreen = ({ route, navigation }) => {
   const [allPosts, setAllPosts] = useState([...posts]);
+
+  const dispatch = useDispatch();
+
   const renderItem = ({ item }) => (
     <PublicationsPost item={item} navigation={navigation} />
   );
 
+  const signOut = () => {
+    dispatch(authSignOutUser());
+  };
   useEffect(() => {
     if (route.params) {
       setAllPosts((prevSt) => [route.params, ...prevSt]);
@@ -35,7 +42,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles.link}
-          onPress={() => authSignOutUser()}
+          onPress={signOut}
         >
           <MaterialIcons
             style={styles.logoutIcon}

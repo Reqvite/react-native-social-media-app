@@ -2,15 +2,30 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from "firebase/auth";
+
 import { auth } from "../../firebase/config";
+import { authSignOut, authStateChange, updateUserProfile } from "./authSlice";
 
 export const authSignUpUser =
   ({ email, password, nickname }) =>
-  async () => {
+  async (dispatch, getState) => {
     try {
-      const user = await createUserWithEmailAndPassword(auth, email, password);
-      console.log(user);
+      await createUserWithEmailAndPassword(auth, email, password);
+
+      await updateProfile(auth.currentUser, {
+        displayName: nickname,
+      });
+
+      const { uid, displayName } = auth.currentUser;
+
+      dispatch(
+        updateUserProfile({
+          userId: uid,
+          nickname: displayName,
+        })
+      );
     } catch (error) {
       console.log(error);
     }
@@ -18,7 +33,7 @@ export const authSignUpUser =
 
 export const authSignInUser =
   ({ email, password }) =>
-  async () => {
+  async (dispatch, getState) => {
     try {
       const user = await signInWithEmailAndPassword(auth, email, password);
       console.log(user);
@@ -27,4 +42,21 @@ export const authSignInUser =
     }
   };
 
-export const authSignOutUser = () => signOut(auth);
+export const authSignOutUser = () => async (dispatch, setState) => {
+  signOut(auth);
+  dispatch(authSignOut());
+};
+
+export const authStateChangeUser = () => async (dispatch, setState) => {
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      const userUpdateProfile = {
+        userId: user.uid,
+        nickname: user.displayName,
+      };
+
+      dispatch(authStateChange({ stateChange: true }));
+      dispatch(updateUserProfile(userUpdateProfile));
+    }
+  });
+};
