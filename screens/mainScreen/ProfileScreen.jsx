@@ -1,6 +1,13 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import {
   ImageBackground,
   StyleSheet,
@@ -12,8 +19,24 @@ import {
 import { ProfilePost } from "../../components/ProfilePost";
 
 import { posts } from "../../data/posts";
+import { db } from "../../firebase/config";
+import { useSelector } from "react-redux";
 
 const ProfileScreen = () => {
+  const userId = useSelector((state) => state.auth.userId);
+  const getPosts = async () => {
+    const q = query(collection(db, "posts"), where("userId", "==", userId));
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      arr.push(doc.id, " => ", arr.push(doc.data()));
+    });
+  };
+
+  useEffect(() => {
+    getPosts();
+  }, []);
+
   const renderItem = ({ item }) => <ProfilePost item={item} />;
   return (
     <View style={styles.container}>

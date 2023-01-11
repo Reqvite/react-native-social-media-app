@@ -11,6 +11,10 @@ import { shareAsync } from "expo-sharing";
 
 import uuid from "react-native-uuid";
 
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase/config";
+
 import {
   View,
   Text,
@@ -25,8 +29,11 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { CameraOptions } from "../../components/CameraOptions";
 import { CameraButtons } from "../../components/CameraButtons";
+import { useSelector } from "react-redux";
 
 const CreatPostScreen = ({ navigation }) => {
+  const user = useSelector((state) => state.auth.nickname);
+  const userId = useSelector((state) => state.auth.userId);
   let cameraRef = useRef(null);
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
@@ -175,9 +182,35 @@ const CreatPostScreen = ({ navigation }) => {
         inputLocation,
         id: uuid.v4(),
       });
+
+      const id = uuid.v4();
+      const photoLink = await uploadPhotoToServer(photo);
+      console.log(userId);
+      await setDoc(doc(db, "posts", `${user}_${id}`), {
+        photo: photoLink,
+        title,
+        likes: 232,
+        comments: 22,
+        photoLocation: { latitude, longitude },
+        inputLocation,
+        id,
+        userId,
+      });
+      uploadPhotoToServer(photo);
       clearPost();
     }
+
     return;
+  };
+
+  const uploadPhotoToServer = async (photo) => {
+    const storage = getStorage();
+    const id = uuid.v4();
+    const storageRef = ref(storage, `images/${id}`);
+    const resp = await fetch(photo);
+    const file = await resp.blob();
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(ref(storage, `images/${id}`));
   };
 
   const clearPost = () => {
@@ -200,7 +233,7 @@ const CreatPostScreen = ({ navigation }) => {
         <View style={styles.bottomBox}>
           <View style={styles.imageLoader}>
             <ImageBackground
-              style={styles.backgroundImg}
+              style={styles.backgroundImg || null}
               source={{ uri: postPhoto }}
             >
               <Camera style={styles.camera} ref={cameraRef} type={type} />
