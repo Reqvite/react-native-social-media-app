@@ -8,6 +8,9 @@ import {
 import { auth } from "../../firebase/config";
 import { authSignOut, authStateChange, updateUserProfile } from "./authSlice";
 
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../firebase/config";
+
 export const authSignUpUser =
   ({ email, password, nickname }) =>
   async (dispatch, getState) => {
@@ -48,11 +51,28 @@ export const authSignOutUser = () => async (dispatch, setState) => {
 };
 
 export const authStateChangeUser = () => async (dispatch, setState) => {
-  auth.onAuthStateChanged((user) => {
+  auth.onAuthStateChanged(async (user) => {
     if (user) {
+      const getPosts = async () => {
+        const posts = [];
+        const q = query(
+          collection(db, "posts"),
+          where("userId", "==", user.uid)
+        );
+
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          posts.push(doc.data());
+        });
+
+        return posts;
+      };
+      const posts = await getPosts();
+
       const userUpdateProfile = {
         userId: user.uid,
         nickname: user.displayName,
+        posts,
       };
 
       dispatch(authStateChange({ stateChange: true }));

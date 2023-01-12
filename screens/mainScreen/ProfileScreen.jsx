@@ -1,13 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+
 import {
   ImageBackground,
   StyleSheet,
@@ -16,29 +8,18 @@ import {
   SafeAreaView,
   FlatList,
 } from "react-native";
+import { useSelector } from "react-redux";
 import { ProfilePost } from "../../components/ProfilePost";
 
-import { posts } from "../../data/posts";
-import { db } from "../../firebase/config";
-import { useSelector } from "react-redux";
+const ProfileScreen = ({ navigation }) => {
+  const userPosts = useSelector((state) => state.auth.posts);
+  const userName = useSelector((state) => state.auth.nickname);
 
-const ProfileScreen = () => {
-  const userId = useSelector((state) => state.auth.userId);
-  console.log(userId);
-  const getPosts = async () => {
-    const q = query(collection(db, "posts"), where("userId", "==", userId));
+  console.log(userPosts);
 
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      arr.push(doc.id, " => ", arr.push(doc.data()));
-    });
-  };
-
-  useEffect(() => {
-    getPosts();
-  }, []);
-
-  const renderItem = ({ item }) => <ProfilePost item={item} />;
+  const renderItem = ({ item }) => (
+    <ProfilePost item={item} navigation={navigation} />
+  );
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -53,10 +34,10 @@ const ProfileScreen = () => {
             size={24}
             color="#BDBDBD"
           />
-          <Text style={styles.name}>Name</Text>
+          <Text style={styles.name}>{userName}</Text>
           <SafeAreaView style={styles.bottomBox}>
             <FlatList
-              data={posts}
+              data={userPosts}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
               style={{

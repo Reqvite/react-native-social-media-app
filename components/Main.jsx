@@ -9,7 +9,7 @@ const Main = () => {
   const { stateChange } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const routing = useRoute(!stateChange);
+  const routing = useRoute(stateChange);
 
   useEffect(() => {
     dispatch(authStateChangeUser());

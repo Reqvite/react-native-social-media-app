@@ -1,10 +1,10 @@
 import { EvilIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
-export const ProfilePost = ({ item }) => {
-  const { photo, title, comments, location, likes } = item;
+export const ProfilePost = ({ item, navigation }) => {
+  const { photo, title, comments, inputLocation, likes, photoLocation } = item;
   return (
     <>
       <Image
@@ -16,8 +16,14 @@ export const ProfilePost = ({ item }) => {
       <Text style={styles.title}>{title}</Text>
       <View style={styles.informationBox}>
         <View style={styles.spanBox}>
-          <EvilIcons name="comment" size={24} color="black" />
-          <Text>{comments}</Text>
+          <TouchableOpacity
+            style={styles.spanBox}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate("Comments")}
+          >
+            <EvilIcons name="comment" size={24} color="black" />
+            <Text>{comments}</Text>
+          </TouchableOpacity>
           <AntDesign
             style={styles.spanLikeIcon}
             name="like2"
@@ -28,7 +34,12 @@ export const ProfilePost = ({ item }) => {
         </View>
         <View style={styles.spanBox}>
           <EvilIcons name="location" size={24} color="black" />
-          <Text>{location}</Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate("Map", { photoLocation })}
+          >
+            <Text>{inputLocation}</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </>
