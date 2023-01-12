@@ -4,7 +4,6 @@ const state = {
   userId: null,
   nickname: null,
   stateChange: false,
-  posts: [],
 };
 
 export const authSlice = createSlice({

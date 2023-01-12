@@ -29,7 +29,9 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { CameraOptions } from "../../components/CameraOptions";
 import { CameraButtons } from "../../components/CameraButtons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { authStateChangeUser } from "../../redux/auth/authOperations";
+import { addPost } from "../../redux/posts/postsOperations";
 
 const CreatPostScreen = ({ navigation }) => {
   const user = useSelector((state) => state.auth.nickname);
@@ -60,6 +62,7 @@ const CreatPostScreen = ({ navigation }) => {
     }
   };
 
+  const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
       const cameraPermission = await Camera.requestCameraPermissionsAsync();
@@ -185,8 +188,9 @@ const CreatPostScreen = ({ navigation }) => {
 
       const id = uuid.v4();
       const photoLink = await uploadPhotoToServer(photo);
-      console.log(userId);
-      await setDoc(doc(db, "posts", `${user}_${id}`), {
+      console.log(photolink);
+
+      const newPost = await setDoc(doc(db, "posts", `${user}_${id}`), {
         photo: photoLink,
         title,
         likes: 232,
@@ -196,7 +200,8 @@ const CreatPostScreen = ({ navigation }) => {
         id,
         userId,
       });
-      uploadPhotoToServer(photo);
+
+      dispatch(addPost(newPost));
       clearPost();
     }
 

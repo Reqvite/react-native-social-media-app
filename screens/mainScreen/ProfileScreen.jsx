@@ -1,4 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { useEffect } from "react";
 
 import {
   ImageBackground,
@@ -8,14 +9,19 @@ import {
   SafeAreaView,
   FlatList,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ProfilePost } from "../../components/ProfilePost";
+import { fetchPosts } from "../../redux/posts/postsOperations";
 
 const ProfileScreen = ({ navigation }) => {
   const userPosts = useSelector((state) => state.auth.posts);
   const userName = useSelector((state) => state.auth.nickname);
+  const posts = useSelector((state) => state.posts.items)
+  const dispatch = useDispatch();
 
-  console.log(userPosts);
+  useEffect(() => {
+    dispatch(fetchPosts());
+  }, []);
 
   const renderItem = ({ item }) => (
     <ProfilePost item={item} navigation={navigation} />
