@@ -11,6 +11,7 @@ export const PublicationsPost = ({ item, navigation }) => {
     inputLocation,
     userPhoto,
     nickname,
+    id,
   } = item;
   return (
     <>
@@ -36,7 +37,7 @@ export const PublicationsPost = ({ item, navigation }) => {
         <TouchableOpacity
           style={styles.spanBox}
           activeOpacity={0.8}
-          onPress={() => navigation.navigate("Comments")}
+          onPress={() => navigation.navigate("Comments", { photo, id })}
         >
           <EvilIcons name="comment" size={24} color="black" />
           <Text>{comments}</Text>

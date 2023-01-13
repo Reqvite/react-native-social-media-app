@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 
+import uuid from "react-native-uuid";
 import {
   View,
   Text,
@@ -16,12 +17,43 @@ import {
 } from "react-native";
 
 import { Comment } from "../../components/Comment";
+import { doc, setDoc } from "firebase/firestore";
+import { useDispatch, useSelector } from "react-redux";
+import { db } from "../../firebase/config";
+import { fetchPostCommnets } from "../../redux/posts/postsOperations";
 
-const CommentsScreen = () => {
+const CommentsScreen = ({ route }) => {
+  const user = useSelector((state) => state.auth.nickname);
+  const userId = useSelector((state) => state.auth.userId);
+  const photoURL = useSelector((state) => state.auth.userPhoto);
+  const comments = useSelector((state) => state.posts.comments);
+  const dispatch = useDispatch();
+  const [message, setMessage] = useState("");
   const renderItem = ({ item }) => <Comment item={item} />;
+  useEffect(() => {
+    dispatch(fetchPostCommnets(route.params.id));
+  }, []);
 
   const handleKeyboard = () => {
     Keyboard.dismiss();
+  };
+
+  const sendMessage = async () => {
+    const date = new Date().getTime();
+    const id = uuid.v4();
+    if (message === "") return;
+
+    const newMessage = {
+      id: id,
+      text: message,
+      createdAt: date,
+      uid: userId,
+      postId: route.params.id,
+      // photoURL,
+    };
+
+    await setDoc(doc(db, "comments", `${user}_${id}`), newMessage);
+    dispatch(fetchPostCommnets(route.params.id));
   };
 
   return (
@@ -32,24 +64,30 @@ const CommentsScreen = () => {
           <Image
             style={styles.postImg}
             source={{
-              uri: "https://reactnative.dev/img/tiny_logo.png",
+              uri: route.params.photo,
             }}
           />
-          {/* <FlatList
-          data={allPosts}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          style={{
-            marginTop: 10,
-            marginBottom: 160,
-          }}
-        /> */}
+          <FlatList
+            data={comments}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            style={{
+              marginTop: 10,
+              marginBottom: 160,
+            }}
+          />
           <View style={styles.commentForm}>
             <TextInput
               placeholder="Write your comment..."
+              value={message}
+              onChangeText={(text) => setMessage(text)}
               style={styles.input}
             />
-            <TouchableOpacity activeOpacity={0.8} style={styles.sendBtn}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.sendBtn}
+              onPress={sendMessage}
+            >
               <Feather name="send" size={24} color="white" />
             </TouchableOpacity>
           </View>

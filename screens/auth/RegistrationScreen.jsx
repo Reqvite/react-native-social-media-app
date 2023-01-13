@@ -15,6 +15,7 @@ import {
 } from "react-native";
 
 import uuid from "react-native-uuid";
+import * as MediaLibrary from "expo-media-library";
 
 import { useDispatch } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
@@ -29,6 +30,7 @@ const initialState = {
 };
 
 export default function RegistrationScreen({ navigation }) {
+  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [inputLoginBgColor, setInputLoginBgColor] = useState("#F8F8F8");
   const [inputEmailBgColor, setInputEmailBgColor] = useState("#F8F8F8");
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
@@ -37,9 +39,18 @@ export default function RegistrationScreen({ navigation }) {
   const [profilePhoto, setProfilePhoto] = useState(
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
   );
+
   const dispatch = useDispatch();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const mediaLibraryPermission =
+        await MediaLibrary.requestPermissionsAsync();
+      setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
+    })();
+  }, []);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -66,22 +77,26 @@ export default function RegistrationScreen({ navigation }) {
   };
 
   const handleRegistration = () => {
-    console.log(state);
     dispatch(authSignUpUser(state));
     setState(initialState);
   };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
 
-    const photoLink = await uploadPhotoToServer(result.assets[0].uri);
-    setProfilePhoto(photoLink);
-    setState((prevState) => ({ ...prevState, userPhoto: photoLink }));
+      const photoLink = await uploadPhotoToServer(result.assets[0].uri);
+      console.log(photoLink);
+      setProfilePhoto(photoLink);
+      setState((prevState) => ({ ...prevState, userPhoto: photoLink }));
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const uploadPhotoToServer = async (photo) => {

@@ -34,9 +34,20 @@ const DefaultPostsScreen = ({ navigation }) => {
     dispatch(authSignOutUser());
   };
 
+  const updatePosts = () => {
+    dispatch(fetchAllPosts());
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topBox}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.updateIcon}
+          onPress={updatePosts}
+        >
+          <MaterialIcons name="update" size={24} color="black" />
+        </TouchableOpacity>
         <Text style={styles.title}>Publications</Text>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -52,18 +63,6 @@ const DefaultPostsScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <SafeAreaView style={styles.bottomBox}>
-        {/* <View style={styles.userBox}>
-          <Image
-            source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8PLI03fmLRu4fSpIl9RqTBwnh4qT6-E0qsw&usqp=CAU",
-            }}
-            style={styles.userPhoto}
-          />
-          <View style={styles.userInformation}>
-            <Text style={styles.userName}>Docktor Who</Text>
-            <Text style={styles.userMail}>email@example.com</Text>
-          </View>
-        </View> */}
         <FlatList
           data={allPosts}
           renderItem={renderItem}
@@ -97,6 +96,10 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat-Bold",
     fontSize: 17,
     marginBottom: 11,
+  },
+  updateIcon: {
+    marginRight: "auto",
+    marginBottom: 10,
   },
   logoutIcon: {
     marginLeft: 103,

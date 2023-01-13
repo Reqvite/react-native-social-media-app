@@ -39,8 +39,9 @@ export const fetchAllPosts = createAsyncThunk(
         return posts;
       };
       const posts = await getPosts();
-      console.log(posts);
-      return posts;
+      return posts.sort(
+        (firstPost, lastPost) => lastPost.createdAt - firstPost.createdAt
+      );
     } catch (err) {
       console.log(err);
       return thunkAPI.rejectWithValue(err.message);
@@ -53,6 +54,29 @@ export const addPost = createAsyncThunk(
     try {
       return post;
     } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
+export const fetchPostCommnets = createAsyncThunk(
+  "posts/fetchPostComments",
+  async (id, thunkAPI) => {
+    try {
+      const getPosts = async () => {
+        const comments = [];
+        const q = query(collection(db, "comments"), where("postId", "==", id));
+
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          comments.push(doc.data());
+        });
+        return comments;
+      };
+      const comments = await getPosts();
+      return comments;
+    } catch (err) {
+      console.log(err);
       return thunkAPI.rejectWithValue(err.message);
     }
   }

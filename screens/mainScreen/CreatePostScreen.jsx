@@ -30,7 +30,7 @@ import { useEffect, useRef, useState } from "react";
 import { CameraOptions } from "../../components/CameraOptions";
 import { CameraButtons } from "../../components/CameraButtons";
 import { useDispatch, useSelector } from "react-redux";
-import { addPost } from "../../redux/posts/postsOperations";
+import { addPost, fetchAllPosts } from "../../redux/posts/postsOperations";
 
 const CreatPostScreen = ({ navigation }) => {
   const user = useSelector((state) => state.auth.nickname);
@@ -41,7 +41,7 @@ const CreatPostScreen = ({ navigation }) => {
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [photo, setPhoto] = useState(null);
   const [postPhoto, setPostPhoto] = useState(
-    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/640px-HD_transparent_picture.png"
   );
   const [title, setTitle] = useState("");
   const [type, setType] = useState(Camera.Constants.Type.back);
@@ -165,7 +165,7 @@ const CreatPostScreen = ({ navigation }) => {
 
   const deletePhoto = () =>
     setPostPhoto(
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/640px-HD_transparent_picture.png"
     );
 
   const sendPhoto = async () => {
@@ -185,16 +185,14 @@ const CreatPostScreen = ({ navigation }) => {
       const photoLink = await uploadPhotoToServer(postPhoto);
 
       const date = new Date().getTime();
-      console.log(date);
       const coords =
         latitude && longitude ? { latitude, longitude } : "noCoords";
-      console.log(coords);
       const newPost = {
         createdAt: date,
         photo: photoLink,
         title,
-        likes: 232,
-        comments: 22,
+        likes: 0,
+        comments: 0,
         photoLocation: coords,
         inputLocation,
         id,
@@ -205,6 +203,7 @@ const CreatPostScreen = ({ navigation }) => {
       await setDoc(doc(db, "posts", `${user}_${id}`), newPost);
 
       dispatch(addPost(newPost));
+      dispatch(fetchAllPosts());
       clearPost();
     }
 
@@ -227,7 +226,7 @@ const CreatPostScreen = ({ navigation }) => {
     setTitle("");
     setInputLocation("");
     setPostPhoto(
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/640px-HD_transparent_picture.png"
     );
     setButtonBgColorBgColor("#F8F8F8");
   };
@@ -328,12 +327,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 8,
   },
-  backgroundImage: {
-    flex: 1,
-    justifyContent: "flex-end",
-    resizeMode: "cover",
-    backgroundColor: "red",
-  },
+  backgroundImg: {},
   camera: {
     position: "relative",
     width: "100%",

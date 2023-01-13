@@ -12,13 +12,13 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
-export const Comment = () => {
-  const messageStatus = uid === auth.currentUser.uid ? "sent" : "received";
-
+export const Comment = ({ item }) => {
+  const { text } = item;
+  // const messageStatus = uid === auth.currentUser.uid ? "sent" : "received";
   return (
-    <Viev>
-      <Text maxW="75vw" p={5} background="#1663cf" borderRadius={10}></Text>
-      <Image
+    <View>
+      <Text styles={{ color: "black" }}>{text}</Text>
+      {/* <Image
         referrerPolicy="no-referrer"
         ml={2}
         src={photoURL}
@@ -26,7 +26,7 @@ export const Comment = () => {
         w="50px"
         h="50px"
         borderRadius="50%"
-      />
-    </Viev>
+      /> */}
+    </View>
   );
 };

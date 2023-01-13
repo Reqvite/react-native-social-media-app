@@ -19,8 +19,8 @@ export const authSignUpUser =
 
       await updateProfile(auth.currentUser, {
         displayName: nickname,
+        photoURL: userPhoto,
       });
-      auth.currentUser.photoURL = userPhoto;
       const { uid, displayName, photoURL } = auth.currentUser;
 
       dispatch(
@@ -60,6 +60,7 @@ export const authStateChangeUser = () => async (dispatch, setState) => {
         userPhoto: user.photoURL,
       };
 
+      console.log(user);
       dispatch(authStateChange({ stateChange: true }));
       dispatch(updateUserProfile(userUpdateProfile));
     }
