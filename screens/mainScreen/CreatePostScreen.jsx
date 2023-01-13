@@ -35,11 +35,14 @@ import { addPost } from "../../redux/posts/postsOperations";
 const CreatPostScreen = ({ navigation }) => {
   const user = useSelector((state) => state.auth.nickname);
   const userId = useSelector((state) => state.auth.userId);
+  const userPhoto = useSelector((state) => state.auth.userPhoto);
   let cameraRef = useRef(null);
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [photo, setPhoto] = useState(null);
-  const [postPhoto, setPostPhoto] = useState("");
+  const [postPhoto, setPostPhoto] = useState(
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+  );
   const [title, setTitle] = useState("");
   const [type, setType] = useState(Camera.Constants.Type.back);
 
@@ -48,20 +51,8 @@ const CreatPostScreen = ({ navigation }) => {
 
   const [buttonBgColor, setButtonBgColorBgColor] = useState("#F8F8F8");
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setPostPhoto(result.assets[0].uri);
-    }
-  };
-
   const dispatch = useDispatch();
+
   useEffect(() => {
     (async () => {
       const cameraPermission = await Camera.requestCameraPermissionsAsync();
@@ -96,6 +87,18 @@ const CreatPostScreen = ({ navigation }) => {
 
   const handleKeyboard = () => {
     Keyboard.dismiss();
+  };
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setPostPhoto(result.assets[0].uri);
+    }
   };
 
   const takePic = async () => {
@@ -160,7 +163,10 @@ const CreatPostScreen = ({ navigation }) => {
         : Camera.Constants.Type.back
     );
 
-  const deletePhoto = () => setPostPhoto("");
+  const deletePhoto = () =>
+    setPostPhoto(
+      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+    );
 
   const sendPhoto = async () => {
     if (
@@ -178,15 +184,23 @@ const CreatPostScreen = ({ navigation }) => {
       const id = uuid.v4();
       const photoLink = await uploadPhotoToServer(postPhoto);
 
+      const date = new Date().getTime();
+      console.log(date);
+      const coords =
+        latitude && longitude ? { latitude, longitude } : "noCoords";
+      console.log(coords);
       const newPost = {
+        createdAt: date,
         photo: photoLink,
         title,
         likes: 232,
         comments: 22,
-        photoLocation: { latitude, longitude },
+        photoLocation: coords,
         inputLocation,
         id,
         userId,
+        userPhoto,
+        nickname: user,
       };
       await setDoc(doc(db, "posts", `${user}_${id}`), newPost);
 
@@ -212,7 +226,9 @@ const CreatPostScreen = ({ navigation }) => {
     setLocation("");
     setTitle("");
     setInputLocation("");
-    setPostPhoto("");
+    setPostPhoto(
+      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+    );
     setButtonBgColorBgColor("#F8F8F8");
   };
 
@@ -228,7 +244,7 @@ const CreatPostScreen = ({ navigation }) => {
         <View style={styles.bottomBox}>
           <View style={styles.imageLoader}>
             <ImageBackground
-              style={styles.backgroundImg || null}
+              style={styles.backgroundImg}
               source={{ uri: postPhoto }}
             >
               <Camera style={styles.camera} ref={cameraRef} type={type} />

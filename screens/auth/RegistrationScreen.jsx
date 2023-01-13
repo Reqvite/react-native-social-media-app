@@ -34,7 +34,9 @@ export default function RegistrationScreen({ navigation }) {
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
 
   const [state, setState] = useState(initialState);
-  const [profilePhoto, setProfilePhoto] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState(
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+  );
   const dispatch = useDispatch();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);

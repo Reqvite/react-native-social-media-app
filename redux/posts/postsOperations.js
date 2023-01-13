@@ -26,6 +26,27 @@ export const fetchPosts = createAsyncThunk(
   }
 );
 
+export const fetchAllPosts = createAsyncThunk(
+  "posts/fetchAllPosts",
+  async (_, thunkAPI) => {
+    try {
+      const getPosts = async () => {
+        const querySnapshot = await getDocs(collection(db, "posts"));
+        const posts = [];
+        querySnapshot.forEach((doc) => {
+          posts.push(doc.data());
+        });
+        return posts;
+      };
+      const posts = await getPosts();
+      console.log(posts);
+      return posts;
+    } catch (err) {
+      console.log(err);
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
 export const addPost = createAsyncThunk(
   "posts/addPost",
   async (post, thunkAPI) => {

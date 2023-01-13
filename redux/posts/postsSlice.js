@@ -1,9 +1,10 @@
-import { fetchPosts, addPost } from "./postsOperations";
+import { fetchPosts, addPost, fetchAllPosts } from "./postsOperations";
 
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   items: [],
+  allItems: [],
   isLoading: false,
   error: null,
 };
@@ -25,17 +26,28 @@ const postsSlice = createSlice({
       .addCase(fetchPosts.rejected, (state, action) => {
         state.error = action.payload;
       })
-    .addCase(addPost.pending, (state, action) => {
-      state.isLoading = true;
-    })
-    .addCase(addPost.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.items.push(action.payload);
-    })
-    .addCase(addPost.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    }),
+      .addCase(fetchAllPosts.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchAllPosts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.allItems = action.payload;
+      })
+      .addCase(fetchAllPosts.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(addPost.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(addPost.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.items.push(action.payload);
+      })
+      .addCase(addPost.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      }),
 });
 
 export const postsReduser = postsSlice.reducer;

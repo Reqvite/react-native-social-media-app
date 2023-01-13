@@ -10,17 +10,21 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { PublicationsPost } from "../../components/PublicationsPost";
 
-import { posts } from "../../data/posts";
 import { authSignOutUser } from "../../redux/auth/authOperations";
+import { fetchAllPosts } from "../../redux/posts/postsOperations";
 
-const DefaultPostsScreen = ({ route, navigation }) => {
-  const [allPosts, setAllPosts] = useState([...posts]);
+const DefaultPostsScreen = ({ navigation }) => {
+  const allPosts = useSelector((state) => state.posts.allItems);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAllPosts());
+  }, []);
 
   const renderItem = ({ item }) => (
     <PublicationsPost item={item} navigation={navigation} />
@@ -29,11 +33,6 @@ const DefaultPostsScreen = ({ route, navigation }) => {
   const signOut = () => {
     dispatch(authSignOutUser());
   };
-  useEffect(() => {
-    if (route.params) {
-      setAllPosts((prevSt) => [route.params, ...prevSt]);
-    }
-  }, [route.params]);
 
   return (
     <View style={styles.container}>
@@ -53,7 +52,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <SafeAreaView style={styles.bottomBox}>
-        <View style={styles.userBox}>
+        {/* <View style={styles.userBox}>
           <Image
             source={{
               uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8PLI03fmLRu4fSpIl9RqTBwnh4qT6-E0qsw&usqp=CAU",
@@ -64,7 +63,7 @@ const DefaultPostsScreen = ({ route, navigation }) => {
             <Text style={styles.userName}>Docktor Who</Text>
             <Text style={styles.userMail}>email@example.com</Text>
           </View>
-        </View>
+        </View> */}
         <FlatList
           data={allPosts}
           renderItem={renderItem}

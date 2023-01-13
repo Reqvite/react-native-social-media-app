@@ -21,7 +21,6 @@ const ProfileScreen = ({ navigation }) => {
   const posts = useSelector((state) => state.posts.items);
   const userId = useSelector((state) => state.auth.userId);
   const profilePhoto = useSelector((state) => state.auth.userPhoto);
-  console.log(profilePhoto);
   const dispatch = useDispatch();
 
   useEffect(() => {

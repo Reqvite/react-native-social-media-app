@@ -3,9 +3,28 @@ import { EvilIcons } from "@expo/vector-icons";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 
 export const PublicationsPost = ({ item, navigation }) => {
-  const { photo, title, comments, photoLocation, inputLocation } = item;
+  const {
+    photo,
+    title,
+    comments,
+    photoLocation,
+    inputLocation,
+    userPhoto,
+    nickname,
+  } = item;
   return (
     <>
+      <View style={styles.userBox}>
+        <View style={styles.userInformation}>
+          <Image
+            source={{
+              uri: userPhoto,
+            }}
+            style={styles.userPhoto}
+          />
+          <Text style={styles.userName}>{nickname}</Text>
+        </View>
+      </View>
       <Image
         source={{
           uri: photo,
@@ -37,8 +56,27 @@ export const PublicationsPost = ({ item, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  userBox: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  userPhoto: {
+    marginTop: 10,
+    borderRadius: 50,
+    width: 35,
+    height: 35,
+  },
+  userInformation: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  userName: {
+    marginLeft: 10,
+    fontFamily: "Montserrat-Bold",
+    fontSize: 13,
+  },
   image: {
-    marginTop: 32,
+    marginTop: 5,
     borderRadius: 8,
     width: 343,
     height: 240,
