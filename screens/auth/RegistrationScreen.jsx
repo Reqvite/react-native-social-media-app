@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -10,17 +11,21 @@ import {
   TextInput,
   Keyboard,
   TouchableOpacity,
-  Alert,
+  Image,
 } from "react-native";
 
-import { useDispatch } from "react-redux";
+import uuid from "react-native-uuid";
 
+import { useDispatch } from "react-redux";
+import * as ImagePicker from "expo-image-picker";
 import { authSignUpUser } from "../../redux/auth/authOperations";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 const initialState = {
   nickname: "",
   email: "",
   password: "",
+  userPhoto: "",
 };
 
 export default function RegistrationScreen({ navigation }) {
@@ -29,6 +34,7 @@ export default function RegistrationScreen({ navigation }) {
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
 
   const [state, setState] = useState(initialState);
+  const [profilePhoto, setProfilePhoto] = useState("");
   const dispatch = useDispatch();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -63,6 +69,30 @@ export default function RegistrationScreen({ navigation }) {
     setState(initialState);
   };
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    const photoLink = await uploadPhotoToServer(result.assets[0].uri);
+    setProfilePhoto(photoLink);
+    setState((prevState) => ({ ...prevState, userPhoto: photoLink }));
+  };
+
+  const uploadPhotoToServer = async (photo) => {
+    const storage = getStorage();
+    const id = uuid.v4();
+    const storageRef = ref(storage, `images/${id}`);
+    const resp = await fetch(photo);
+    const file = await resp.blob();
+    await uploadBytes(storageRef, file);
+    const link = await getDownloadURL(ref(storage, `images/${id}`));
+    return link;
+  };
+
   return (
     <TouchableWithoutFeedback onPress={handleKeyboard}>
       <KeyboardAvoidingView
@@ -74,7 +104,19 @@ export default function RegistrationScreen({ navigation }) {
           style={styles.image}
         >
           <View style={styles.registrationBox}>
-            <View style={styles.photoBox}></View>
+            <View style={styles.photoBox}>
+              <Image
+                style={styles.profilePhoto}
+                source={{ uri: profilePhoto }}
+              />
+              <TouchableOpacity
+                activeOpacity={0.2}
+                style={styles.addPhotoBtn}
+                onPress={pickImage}
+              >
+                <Ionicons name="add-circle-outline" size={30} color="#FF6C00" />
+              </TouchableOpacity>
+            </View>
             <Text style={styles.title}>Sign Up</Text>
             <View style={styles.form}>
               <TextInput
@@ -166,6 +208,15 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: "#F6F6F6",
   },
+  profilePhoto: {
+    flex: 1,
+    borderRadius: 16,
+  },
+  addPhotoBtn: {
+    position: "absolute",
+    right: -15,
+    bottom: 10,
+  },
   form: {
     width: "100%",
     paddingHorizontal: 20,
@@ -210,12 +261,6 @@ const styles = StyleSheet.create({
   btnTitle: {
     color: "#f0f8ff",
     fontSize: 18,
-  },
-  link: {
-    backgroundColor: "transparent",
-    marginTop: 15,
-    fontSize: 18,
-    textAlign: "center",
   },
   linkText: {
     textAlign: "center",

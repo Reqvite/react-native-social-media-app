@@ -5,14 +5,11 @@ import { db } from "../../firebase/config";
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
-  async (_, thunkAPI) => {
+  async (uid, thunkAPI) => {
     try {
       const getPosts = async () => {
         const posts = [];
-        const q = query(
-          collection(db, "posts"),
-          where("userId", "==", "Ww6C1ZtflHeE0SNqXrb5LmnzHIf1")
-        );
+        const q = query(collection(db, "posts"), where("userId", "==", uid));
 
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
@@ -33,9 +30,7 @@ export const addPost = createAsyncThunk(
   "posts/addPost",
   async (post, thunkAPI) => {
     try {
-      console.log(post);
-      //   const resp = await axios.post("/contacts", contact);
-      //   return resp.data;
+      return post;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
     }

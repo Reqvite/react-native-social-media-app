@@ -7,7 +7,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 
-import { shareAsync } from "expo-sharing";
+import * as Sharing from "expo-sharing";
 
 import uuid from "react-native-uuid";
 
@@ -30,7 +30,6 @@ import { useEffect, useRef, useState } from "react";
 import { CameraOptions } from "../../components/CameraOptions";
 import { CameraButtons } from "../../components/CameraButtons";
 import { useDispatch, useSelector } from "react-redux";
-import { authStateChangeUser } from "../../redux/auth/authOperations";
 import { addPost } from "../../redux/posts/postsOperations";
 
 const CreatPostScreen = ({ navigation }) => {
@@ -112,7 +111,7 @@ const CreatPostScreen = ({ navigation }) => {
 
   if (photo) {
     const sharePic = () => {
-      shareAsync(photo.uri).then(() => {
+      Sharing.shareAsync(photo.uri).then(() => {
         setPhoto(undefined);
       });
     };
@@ -169,28 +168,17 @@ const CreatPostScreen = ({ navigation }) => {
       title.length !== 0 &&
       inputLocation.length !== 0
     ) {
-      let photo = postPhoto;
-
       let address = await Location.geocodeAsync(inputLocation);
 
       let latitude = address[0]?.latitude;
       let longitude = address[0]?.longitude;
 
-      navigation.navigate("Publications", {
-        photo,
-        title,
-        likes: 232,
-        comments: 22,
-        photoLocation: { latitude, longitude },
-        inputLocation,
-        id: uuid.v4(),
-      });
+      navigation.navigate("Publications");
 
       const id = uuid.v4();
-      const photoLink = await uploadPhotoToServer(photo);
-      console.log(photolink);
+      const photoLink = await uploadPhotoToServer(postPhoto);
 
-      const newPost = await setDoc(doc(db, "posts", `${user}_${id}`), {
+      const newPost = {
         photo: photoLink,
         title,
         likes: 232,
@@ -199,7 +187,8 @@ const CreatPostScreen = ({ navigation }) => {
         inputLocation,
         id,
         userId,
-      });
+      };
+      await setDoc(doc(db, "posts", `${user}_${id}`), newPost);
 
       dispatch(addPost(newPost));
       clearPost();
@@ -215,7 +204,8 @@ const CreatPostScreen = ({ navigation }) => {
     const resp = await fetch(photo);
     const file = await resp.blob();
     await uploadBytes(storageRef, file);
-    return await getDownloadURL(ref(storage, `images/${id}`));
+    const link = await getDownloadURL(ref(storage, `images/${id}`));
+    return link;
   };
 
   const clearPost = () => {

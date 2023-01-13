@@ -12,7 +12,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase/config";
 
 export const authSignUpUser =
-  ({ email, password, nickname }) =>
+  ({ email, password, nickname, userPhoto }) =>
   async (dispatch, getState) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -20,13 +20,14 @@ export const authSignUpUser =
       await updateProfile(auth.currentUser, {
         displayName: nickname,
       });
-
-      const { uid, displayName } = auth.currentUser;
+      auth.currentUser.photoURL = userPhoto;
+      const { uid, displayName, photoURL } = auth.currentUser;
 
       dispatch(
         updateUserProfile({
           userId: uid,
           nickname: displayName,
+          userPhoto: photoURL,
         })
       );
     } catch (error) {
@@ -56,6 +57,7 @@ export const authStateChangeUser = () => async (dispatch, setState) => {
       const userUpdateProfile = {
         userId: user.uid,
         nickname: user.displayName,
+        userPhoto: user.photoURL,
       };
 
       dispatch(authStateChange({ stateChange: true }));

@@ -3,29 +3,38 @@ import { useEffect } from "react";
 
 import {
   ImageBackground,
+  Image,
   StyleSheet,
   Text,
   View,
   SafeAreaView,
+  TouchableOpacity,
   FlatList,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { ProfilePost } from "../../components/ProfilePost";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 import { fetchPosts } from "../../redux/posts/postsOperations";
 
 const ProfileScreen = ({ navigation }) => {
-  const userPosts = useSelector((state) => state.auth.posts);
   const userName = useSelector((state) => state.auth.nickname);
-  const posts = useSelector((state) => state.posts.items)
+  const posts = useSelector((state) => state.posts.items);
+  const userId = useSelector((state) => state.auth.userId);
+  const profilePhoto = useSelector((state) => state.auth.userPhoto);
+  console.log(profilePhoto);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchPosts());
+    dispatch(fetchPosts(userId));
   }, []);
 
   const renderItem = ({ item }) => (
     <ProfilePost item={item} navigation={navigation} />
   );
+
+  const signOut = () => {
+    dispatch(authSignOutUser());
+  };
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -33,17 +42,25 @@ const ProfileScreen = ({ navigation }) => {
         style={styles.image}
       >
         <View style={styles.profileBox}>
-          <View style={styles.photoBox} />
-          <MaterialIcons
-            style={styles.logoutIcon}
-            name="logout"
-            size={24}
-            color="#BDBDBD"
-          />
+          <View style={styles.photoBox}>
+            <Image style={styles.profilePhoto} source={{ uri: profilePhoto }} />
+          </View>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.link}
+            onPress={signOut}
+          >
+            <MaterialIcons
+              style={styles.logoutIcon}
+              name="logout"
+              size={24}
+              color="#BDBDBD"
+            />
+          </TouchableOpacity>
           <Text style={styles.name}>{userName}</Text>
           <SafeAreaView style={styles.bottomBox}>
             <FlatList
-              data={userPosts}
+              data={posts}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
               style={{
@@ -84,6 +101,10 @@ const styles = StyleSheet.create({
     width: 120,
     borderRadius: 16,
     backgroundColor: "#F6F6F6",
+  },
+  profilePhoto: {
+    flex: 1,
+    borderRadius: 16,
   },
   logoutIcon: {
     marginTop: 22,
