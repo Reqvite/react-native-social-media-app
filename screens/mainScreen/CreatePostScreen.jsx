@@ -200,7 +200,8 @@ const CreatPostScreen = ({ navigation }) => {
         userPhoto,
         nickname: user,
       };
-      await setDoc(doc(db, "posts", `${user}_${id}`), newPost);
+      await setDoc(doc(db, "posts", `${id}`), newPost);
+      
 
       dispatch(addPost(newPost));
       dispatch(fetchAllPosts());

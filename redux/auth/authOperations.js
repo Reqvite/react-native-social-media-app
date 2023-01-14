@@ -23,6 +23,7 @@ export const authSignUpUser =
       });
       const { uid, displayName, photoURL } = auth.currentUser;
 
+      console.log(auth.currentUser);
       dispatch(
         updateUserProfile({
           userId: uid,

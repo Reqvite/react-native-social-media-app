@@ -9,6 +9,7 @@ import RegistrationScreen from "./screens/auth/RegistrationScreen";
 import ProfileScreen from "./screens/mainScreen/ProfileScreen";
 import PostsScreen from "./screens/mainScreen/PostsScreen";
 import CreatePostScreen from "./screens/mainScreen/CreatePostScreen";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const AuthStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -39,13 +40,20 @@ export const useRoute = (isAuth) => {
       <MainTab.Screen
         name="Post"
         component={PostsScreen}
-        options={{
+        options={({ route }) => ({
+          tabBarStyle: ((route) => {
+            const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+            if (routeName === "Comments" || routeName === "Map") {
+              return { display: "none" };
+            }
+            return;
+          })(route),
           tabBarIcon: ({ focused, color, size }) => (
             <MaterialIcons name="dynamic-feed" size={size} color={color} />
           ),
           tabBarActiveTintColor: "#FF6C00",
           headerShown: false,
-        }}
+        })}
       />
       <MainTab.Screen
         name="CreatePost"

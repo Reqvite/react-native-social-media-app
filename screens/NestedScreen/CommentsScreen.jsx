@@ -17,7 +17,7 @@ import {
 } from "react-native";
 
 import { Comment } from "../../components/Comment";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "../../firebase/config";
 import { fetchPostCommnets } from "../../redux/posts/postsOperations";
@@ -49,10 +49,15 @@ const CommentsScreen = ({ route }) => {
       createdAt: date,
       uid: userId,
       postId: route.params.id,
-      // photoURL,
+      photoURL,
     };
 
-    await setDoc(doc(db, "comments", `${user}_${id}`), newMessage);
+    await setDoc(doc(db, "comments", `${id}`), newMessage);
+    const postRef = doc(db, "posts", route.params.id);
+
+    await updateDoc(postRef, {
+      comments: comments.length + 1,
+    });
     dispatch(fetchPostCommnets(route.params.id));
   };
 
@@ -61,37 +66,31 @@ const CommentsScreen = ({ route }) => {
       <View style={styles.container}>
         <View style={styles.topBox} />
         <SafeAreaView style={styles.bottomBox}>
-          <Image
-            style={styles.postImg}
-            source={{
-              uri: route.params.photo,
-            }}
-          />
           <FlatList
             data={comments}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             style={{
               marginTop: 10,
-              marginBottom: 160,
+              marginBottom: 60,
             }}
           />
-          <View style={styles.commentForm}>
-            <TextInput
-              placeholder="Write your comment..."
-              value={message}
-              onChangeText={(text) => setMessage(text)}
-              style={styles.input}
-            />
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.sendBtn}
-              onPress={sendMessage}
-            >
-              <Feather name="send" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
         </SafeAreaView>
+        <View style={styles.commentForm}>
+          <TextInput
+            placeholder="Write your comment..."
+            value={message}
+            onChangeText={(text) => setMessage(text)}
+            style={styles.input}
+          />
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.sendBtn}
+            onPress={sendMessage}
+          >
+            <Feather name="send" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -107,15 +106,11 @@ const styles = StyleSheet.create({
     borderBottomColor: "#BDBDBD",
   },
   bottomBox: {
-    paddingHorizontal: 16,
-    marginTop: 32,
-  },
-  postImg: {
-    width: 343,
-    height: 240,
-    borderRadius: 8,
+    marginHorizontal: 10,
   },
   commentForm: {
+    marginBottom: 5,
+    marginTop: "auto",
     position: "relative",
   },
   input: {
