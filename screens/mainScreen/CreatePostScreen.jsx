@@ -201,7 +201,6 @@ const CreatPostScreen = ({ navigation }) => {
         nickname: user,
       };
       await setDoc(doc(db, "posts", `${id}`), newPost);
-      
 
       dispatch(addPost(newPost));
       dispatch(fetchAllPosts());
@@ -319,6 +318,7 @@ const styles = StyleSheet.create({
     marginBottom: 11,
   },
   bottomBox: {
+    alignSelf: "center",
     paddingHorizontal: 16,
     marginTop: 32,
   },

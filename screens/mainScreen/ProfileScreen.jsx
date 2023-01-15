@@ -12,7 +12,7 @@ import {
   FlatList,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { ProfilePost } from "../../components/ProfilePost";
+import { PublicationsPost } from "../../components/PublicationsPost";
 import { authSignOutUser } from "../../redux/auth/authOperations";
 import { fetchPosts } from "../../redux/posts/postsOperations";
 
@@ -28,12 +28,13 @@ const ProfileScreen = ({ navigation }) => {
   }, []);
 
   const renderItem = ({ item }) => (
-    <ProfilePost item={item} navigation={navigation} />
+    <PublicationsPost item={item} navigation={navigation} />
   );
 
   const signOut = () => {
     dispatch(authSignOutUser());
   };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -57,17 +58,21 @@ const ProfileScreen = ({ navigation }) => {
             />
           </TouchableOpacity>
           <Text style={styles.name}>{userName}</Text>
-          <SafeAreaView style={styles.bottomBox}>
-            <FlatList
-              data={posts}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              style={{
-                marginTop: 10,
-                marginBottom: 160,
-              }}
-            />
-          </SafeAreaView>
+          {posts.length === 0 ? (
+            <Text style={styles.error}>You don't have any posts yet.</Text>
+          ) : (
+            <SafeAreaView style={styles.bottomBox}>
+              <FlatList
+                data={posts}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+                style={{
+                  marginTop: 10,
+                  marginBottom: 160,
+                }}
+              />
+            </SafeAreaView>
+          )}
         </View>
       </ImageBackground>
     </View>
@@ -114,6 +119,14 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat-Bold",
     fontSize: 30,
     textAlign: "center",
+  },
+  bottomBox: {
+    alignSelf: "center",
+  },
+  error: {
+    marginTop: 20,
+    alignSelf: "center",
+    fontFamily: "Montserrat-Bold",
   },
 });
 

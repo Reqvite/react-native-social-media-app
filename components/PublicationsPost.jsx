@@ -1,6 +1,10 @@
 import { EvilIcons } from "@expo/vector-icons";
 
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { clickProps } from "react-native-web/dist/cjs/modules/forwardedProps";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 export const PublicationsPost = ({ item, navigation }) => {
   const {
@@ -12,20 +16,31 @@ export const PublicationsPost = ({ item, navigation }) => {
     userPhoto,
     nickname,
     id,
+    likes,
   } = item;
+
+  const like = async () => {
+    console.log("like");
+    const postRef = doc(db, "posts", id);
+    await updateDoc(postRef, {
+      likes: likes + 1,
+    });
+  };
   return (
     <>
-      <View style={styles.userBox}>
-        <View style={styles.userInformation}>
-          <Image
-            source={{
-              uri: userPhoto,
-            }}
-            style={styles.userPhoto}
-          />
-          <Text style={styles.userName}>{nickname}</Text>
+      {navigation.getState().index === 0 && (
+        <View style={styles.userBox}>
+          <View style={styles.userInformation}>
+            <Image
+              source={{
+                uri: userPhoto,
+              }}
+              style={styles.userPhoto}
+            />
+            <Text style={styles.userName}>{nickname}</Text>
+          </View>
         </View>
-      </View>
+      )}
       <Image
         source={{
           uri: photo,
@@ -40,9 +55,19 @@ export const PublicationsPost = ({ item, navigation }) => {
           onPress={() => navigation.navigate("Comments", { photo, id })}
         >
           <EvilIcons name="comment" size={24} color="black" />
-          <Text>{comments}</Text>
+          <Text style={styles.spanValue}>{comments}</Text>
         </TouchableOpacity>
-        <View style={styles.spanBox}>
+        <TouchableOpacity style={styles.spanBox} activeOpacity={0.8}>
+          <AntDesign
+            style={styles.spanLikeIcon}
+            name="like2"
+            size={20}
+            color="black"
+            onPress={like}
+          />
+          <Text style={styles.spanValue}>{likes}</Text>
+        </TouchableOpacity>
+        <View style={styles.spanBoxLocation}>
           <EvilIcons name="location" size={24} color="black" />
           <TouchableOpacity
             activeOpacity={0.8}
@@ -90,10 +115,19 @@ const styles = StyleSheet.create({
   informationBox: {
     marginTop: 12,
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: 343,
   },
   spanBox: {
     flexDirection: "row",
+    alignItems: "center",
+  },
+  spanLikeIcon: {
+    marginLeft: 10,
+  },
+  spanBoxLocation: {
+    flexDirection: "row",
+    marginLeft: "auto",
+  },
+  spanValue: {
+    marginLeft: 5,
   },
 });

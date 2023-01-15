@@ -74,7 +74,10 @@ export const fetchPostCommnets = createAsyncThunk(
         return comments;
       };
       const comments = await getPosts();
-      return comments;
+      return comments.sort(
+        (firstComment, lastComment) =>
+          lastComment.createdAt - firstComment.createdAt
+      );
     } catch (err) {
       console.log(err);
       return thunkAPI.rejectWithValue(err.message);

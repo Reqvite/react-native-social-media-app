@@ -1,11 +1,10 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import {
   View,
   Text,
   StyleSheet,
-  Image,
   SafeAreaView,
   FlatList,
   TouchableOpacity,
@@ -67,9 +66,9 @@ const DefaultPostsScreen = ({ navigation }) => {
           data={allPosts}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
           style={{
-            marginTop: 10,
-            marginBottom: 160,
+            marginBottom: 100,
           }}
         />
       </SafeAreaView>
@@ -106,8 +105,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   bottomBox: {
-    paddingHorizontal: 16,
-    marginTop: 32,
+    marginTop: 5,
+    alignSelf: "center",
   },
   userBox: {
     flexDirection: "row",

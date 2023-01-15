@@ -59,6 +59,7 @@ const CommentsScreen = ({ route }) => {
       comments: comments.length + 1,
     });
     dispatch(fetchPostCommnets(route.params.id));
+    setMessage("");
   };
 
   return (
@@ -68,11 +69,11 @@ const CommentsScreen = ({ route }) => {
         <SafeAreaView style={styles.bottomBox}>
           <FlatList
             data={comments}
+            showsVerticalScrollIndicator={false}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             style={{
               marginTop: 10,
-              marginBottom: 60,
             }}
           />
         </SafeAreaView>
@@ -107,6 +108,7 @@ const styles = StyleSheet.create({
   },
   bottomBox: {
     marginHorizontal: 10,
+    flex: 1,
   },
   commentForm: {
     marginBottom: 5,

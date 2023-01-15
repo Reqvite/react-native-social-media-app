@@ -11,21 +11,22 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-     "plugins": [
+    "plugins": [
       [
         "expo-media-library",
         {
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
           "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
           "isAccessMediaLocationEnabled": true
-        }], 
+        }
+      ],
       [
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-     ],
+    ],
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -33,13 +34,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.reqvite.reactnativepr"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.reqvite.reactnativepr"
     },
     "web": {
       "favicon": "./assets/favicon.png"

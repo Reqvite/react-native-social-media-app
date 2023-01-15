@@ -281,6 +281,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   linkText: {
+    marginTop: 16,
     textAlign: "center",
     color: "#1B4371",
     fontSize: 18,
