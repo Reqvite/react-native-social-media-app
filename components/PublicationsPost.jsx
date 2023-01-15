@@ -2,11 +2,16 @@ import { EvilIcons } from "@expo/vector-icons";
 
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { clickProps } from "react-native-web/dist/cjs/modules/forwardedProps";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { useDispatch } from "react-redux";
+import { fetchAllPosts } from "../redux/posts/postsOperations";
+import { useEffect, useState } from "react";
 
 export const PublicationsPost = ({ item, navigation }) => {
+  const dispatch = useDispatch();
+  const [likeStatus, setLikeStatus] = useState("black");
+
   const {
     photo,
     title,
@@ -19,12 +24,28 @@ export const PublicationsPost = ({ item, navigation }) => {
     likes,
   } = item;
 
+  useEffect(() => {
+    if (likes.includes(nickname)) {
+      setLikeStatus("#FF6C00");
+    }
+  }, []);
+
+  const postRef = doc(db, "posts", id);
   const like = async () => {
-    console.log("like");
-    const postRef = doc(db, "posts", id);
-    await updateDoc(postRef, {
-      likes: likes + 1,
-    });
+    if (likes.includes(nickname)) {
+      const filteredLikes = likes.filter((like) => like !== nickname);
+      await updateDoc(postRef, {
+        likes: filteredLikes,
+      });
+      setLikeStatus("black");
+      dispatch(fetchAllPosts());
+    } else {
+      await updateDoc(postRef, {
+        likes: [...likes, nickname],
+      });
+      setLikeStatus("#FF6C00");
+      dispatch(fetchAllPosts());
+    }
   };
   return (
     <>
@@ -62,10 +83,10 @@ export const PublicationsPost = ({ item, navigation }) => {
             style={styles.spanLikeIcon}
             name="like2"
             size={20}
-            color="black"
+            color={likeStatus}
             onPress={like}
           />
-          <Text style={styles.spanValue}>{likes}</Text>
+          <Text style={styles.spanValue}>{likes?.length}</Text>
         </TouchableOpacity>
         <View style={styles.spanBoxLocation}>
           <EvilIcons name="location" size={24} color="black" />

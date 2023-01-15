@@ -19,13 +19,14 @@ import { fetchPosts } from "../../redux/posts/postsOperations";
 const ProfileScreen = ({ navigation }) => {
   const userName = useSelector((state) => state.auth.nickname);
   const posts = useSelector((state) => state.posts.items);
+  const allPosts = useSelector((state) => state.posts.allItems);
   const userId = useSelector((state) => state.auth.userId);
   const profilePhoto = useSelector((state) => state.auth.userPhoto);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchPosts(userId));
-  }, []);
+  }, [allPosts]);
 
   const renderItem = ({ item }) => (
     <PublicationsPost item={item} navigation={navigation} />

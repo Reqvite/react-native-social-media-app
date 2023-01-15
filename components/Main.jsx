@@ -1,9 +1,10 @@
 import { NavigationContainer } from "@react-navigation/native";
 
 import { useRoute } from "../router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { authStateChangeUser } from "../redux/auth/authOperations";
+import { StyleSheet, Text, ActivityIndicator } from "react-native";
 
 const Main = () => {
   const { stateChange } = useSelector((state) => state.auth);
@@ -15,7 +16,11 @@ const Main = () => {
     dispatch(authStateChangeUser());
   }, []);
 
-  return <NavigationContainer>{routing}</NavigationContainer>;
+  return !stateChange ? (
+    <ActivityIndicator size="large" />
+  ) : (
+    <NavigationContainer>{routing}</NavigationContainer>
+  );
 };
 
 export default Main;

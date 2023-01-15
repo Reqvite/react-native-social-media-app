@@ -191,7 +191,7 @@ const CreatPostScreen = ({ navigation }) => {
         createdAt: date,
         photo: photoLink,
         title,
-        likes: 0,
+        likes: [],
         comments: 0,
         photoLocation: coords,
         inputLocation,
