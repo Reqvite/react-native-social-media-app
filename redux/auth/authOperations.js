@@ -10,6 +10,7 @@ import { authSignOut, authStateChange, updateUserProfile } from "./authSlice";
 
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { Alert } from "react-native";
 
 export const authSignUpUser =
   ({ email, password, nickname, userPhoto }) =>
@@ -23,7 +24,6 @@ export const authSignUpUser =
       });
       const { uid, displayName, photoURL } = auth.currentUser;
 
-      console.log(auth.currentUser);
       dispatch(
         updateUserProfile({
           userId: uid,
@@ -32,7 +32,7 @@ export const authSignUpUser =
         })
       );
     } catch (error) {
-      console.log(error);
+      Alert.alert(error.message);
     }
   };
 
@@ -41,9 +41,8 @@ export const authSignInUser =
   async (dispatch, getState) => {
     try {
       const user = await signInWithEmailAndPassword(auth, email, password);
-      console.log(user);
     } catch (error) {
-      console.log(error);
+      Alert.alert(error.message);
     }
   };
 
@@ -54,16 +53,19 @@ export const authSignOutUser = () => async (dispatch, setState) => {
 
 export const authStateChangeUser = () => async (dispatch, setState) => {
   auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      const userUpdateProfile = {
-        userId: user.uid,
-        nickname: user.displayName,
-        userPhoto: user.photoURL,
-      };
+    try {
+      if (user) {
+        const userUpdateProfile = {
+          userId: user.uid,
+          nickname: user.displayName,
+          userPhoto: user.photoURL,
+        };
 
-      console.log(user);
-      dispatch(authStateChange({ stateChange: true }));
-      dispatch(updateUserProfile(userUpdateProfile));
+        dispatch(authStateChange({ stateChange: true }));
+        dispatch(updateUserProfile(userUpdateProfile));
+      }
+    } catch (error) {
+      Alert.alert(error.message);
     }
   });
 };

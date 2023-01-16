@@ -47,32 +47,12 @@ export default function RegistrationScreen({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
   useEffect(() => {
     (async () => {
       const mediaLibraryPermission =
         await MediaLibrary.requestPermissionsAsync();
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
     })();
-
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        setKeyboardVisible(true);
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => {
-        setKeyboardVisible(false);
-      }
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
   }, []);
 
   const handleKeyboard = () => {

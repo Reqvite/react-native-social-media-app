@@ -24,30 +24,9 @@ const initialState = {
 export default function LoginScreen({ navigation }) {
   const [inputEmailBgColor, setInputEmailBgColor] = useState("#F8F8F8");
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const [state, setState] = useState(initialState);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        setKeyboardVisible(true);
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => {
-        setKeyboardVisible(false);
-      }
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   const handleKeyboard = () => {
     Keyboard.dismiss();
@@ -55,7 +34,6 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = () => {
     dispatch(authSignInUser(state));
-    console.log(state);
     setState(initialState);
   };
 
