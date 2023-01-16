@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   ImageBackground,
   StyleSheet,
@@ -57,13 +56,14 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = () => {
     dispatch(authSignInUser(state));
     console.log(state);
-        setState(initialState);
+    setState(initialState);
   };
 
   return (
     <TouchableWithoutFeedback onPress={handleKeyboard}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={-80}
         style={styles.container}
       >
         <ImageBackground
@@ -96,26 +96,24 @@ export default function LoginScreen({ navigation }) {
                 onBlur={() => setInputPasswordBgColor("#F8F8F8")}
                 textAlign={"center"}
               />
-              {!isKeyboardVisible && (
-                <View>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={styles.btn}
-                    onPress={handleLogin}
-                  >
-                    <Text style={styles.btnTitle}>Login</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={styles.link}
-                    onPress={() => navigation.navigate("Registration")}
-                  >
-                    <Text style={styles.linkText}>
-                      Don't have an account? Sign Up
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              <View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.btn}
+                  onPress={handleLogin}
+                >
+                  <Text style={styles.btnTitle}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.link}
+                  onPress={() => navigation.navigate("Registration")}
+                >
+                  <Text style={styles.linkText}>
+                    Don't have an account? Sign Up
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </ImageBackground>

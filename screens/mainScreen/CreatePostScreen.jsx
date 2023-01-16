@@ -1,20 +1,13 @@
-import { EvilIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-
-import { Camera } from "expo-camera";
-
+import { EvilIcons, AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
-
 import * as Sharing from "expo-sharing";
-
 import uuid from "react-native-uuid";
-
+import { Camera } from "expo-camera";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
-
 import {
   View,
   Text,
@@ -26,7 +19,6 @@ import {
   ImageBackground,
   ActivityIndicator,
 } from "react-native";
-
 import { useEffect, useRef, useState } from "react";
 import { CameraOptions } from "../../components/CameraOptions";
 import { CameraButtons } from "../../components/CameraButtons";
@@ -34,11 +26,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { addPost, fetchAllPosts } from "../../redux/posts/postsOperations";
 
 const CreatPostScreen = ({ navigation }) => {
-  const user = useSelector((state) => state.auth.nickname);
-  const userId = useSelector((state) => state.auth.userId);
-  const userPhoto = useSelector((state) => state.auth.userPhoto);
+  const { nickname, userId, userPhoto } = useSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState(false);
-  let cameraRef = useRef(null);
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [photo, setPhoto] = useState(null);
@@ -47,13 +36,11 @@ const CreatPostScreen = ({ navigation }) => {
   );
   const [title, setTitle] = useState("");
   const [type, setType] = useState(Camera.Constants.Type.back);
-
   const [location, setLocation] = useState(null);
   const [inputLocation, setInputLocation] = useState("");
-
   const [buttonBgColor, setButtonBgColorBgColor] = useState("#F8F8F8");
-
   const dispatch = useDispatch();
+  const cameraRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -61,7 +48,7 @@ const CreatPostScreen = ({ navigation }) => {
       const mediaLibraryPermission =
         await MediaLibrary.requestPermissionsAsync();
 
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       setHasCameraPermission(cameraPermission.status === "granted");
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
 
@@ -80,28 +67,30 @@ const CreatPostScreen = ({ navigation }) => {
     })();
   }, [postPhoto, title, inputLocation]);
 
-  if (hasCameraPermission === null) {
-    return <View />;
-  }
-  if (hasCameraPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
-
-  const handleKeyboard = () => {
-    Keyboard.dismiss();
-  };
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.1,
     });
 
     if (!result.canceled) {
       setPostPhoto(result.assets[0].uri);
     }
   };
+
+  const deletePhoto = () =>
+    setPostPhoto(
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/640px-HD_transparent_picture.png"
+    );
+
+  const handleTypeOfCamera = () =>
+    setType(
+      type === Camera.Constants.Type.back
+        ? Camera.Constants.Type.front
+        : Camera.Constants.Type.back
+    );
 
   const takePic = async () => {
     let options = {
@@ -110,7 +99,7 @@ const CreatPostScreen = ({ navigation }) => {
       exif: false,
     };
 
-    let newPhoto = await cameraRef.current.takePictureAsync(options);
+    const newPhoto = await cameraRef.current.takePictureAsync(options);
     setPhoto(newPhoto);
   };
 
@@ -125,11 +114,11 @@ const CreatPostScreen = ({ navigation }) => {
       setIsLoading(true);
       setPostPhoto(photo.uri);
       setPhoto(undefined);
-      let location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({});
       setLocation(location);
 
-      let latitude = location?.coords.latitude;
-      let longitude = location?.coords.longitude;
+      const latitude = location?.coords.latitude;
+      const longitude = location?.coords.longitude;
 
       const geoCode = await Location.reverseGeocodeAsync({
         latitude,
@@ -160,18 +149,6 @@ const CreatPostScreen = ({ navigation }) => {
     );
   }
 
-  const handleTypeOfCamera = () =>
-    setType(
-      type === Camera.Constants.Type.back
-        ? Camera.Constants.Type.front
-        : Camera.Constants.Type.back
-    );
-
-  const deletePhoto = () =>
-    setPostPhoto(
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/640px-HD_transparent_picture.png"
-    );
-
   const sendPhoto = async () => {
     if (
       postPhoto.length !== 0 &&
@@ -179,10 +156,9 @@ const CreatPostScreen = ({ navigation }) => {
       inputLocation.length !== 0
     ) {
       setIsLoading(true);
-      let address = await Location.geocodeAsync(inputLocation);
-
-      let latitude = address[0]?.latitude;
-      let longitude = address[0]?.longitude;
+      const address = await Location.geocodeAsync(inputLocation);
+      const latitude = address[0]?.latitude;
+      const longitude = address[0]?.longitude;
 
       const id = uuid.v4();
       const photoLink = await uploadPhotoToServer(postPhoto);
@@ -201,7 +177,7 @@ const CreatPostScreen = ({ navigation }) => {
         id,
         userId,
         userPhoto,
-        nickname: user,
+        nickname,
       };
       await setDoc(doc(db, "posts", `${id}`), newPost);
 
@@ -218,6 +194,7 @@ const CreatPostScreen = ({ navigation }) => {
   const uploadPhotoToServer = async (photo) => {
     const storage = getStorage();
     const id = uuid.v4();
+    console.log(id);
     const storageRef = ref(storage, `images/${id}`);
     const resp = await fetch(photo);
     const file = await resp.blob();
@@ -235,6 +212,11 @@ const CreatPostScreen = ({ navigation }) => {
     );
     setButtonBgColorBgColor("#F8F8F8");
   };
+
+  const handleKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   const loaderInput = isLoading && inputLocation.length === 0;
   return (
     <TouchableWithoutFeedback onPress={handleKeyboard}>
@@ -259,6 +241,10 @@ const CreatPostScreen = ({ navigation }) => {
                 takePic={takePic}
               />
             </ImageBackground>
+            {hasCameraPermission === null ||
+              (hasCameraPermission === false && (
+                <Text>No access to camera</Text>
+              ))}
           </View>
           <View style={styles.form}>
             <TextInput
@@ -429,7 +415,7 @@ const styles = StyleSheet.create({
   loactionLoader: {
     position: "absolute",
     bottom: "20%",
-    left: "28%",
+    right: 0,
   },
 });
 

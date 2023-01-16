@@ -1,6 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect } from "react";
-
 import {
   View,
   Text,
@@ -11,16 +10,13 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-
 import { PublicationsPost } from "../../components/PublicationsPost";
 import { authSignOutUser } from "../../redux/auth/authOperations";
 import { fetchAllPosts } from "../../redux/posts/postsOperations";
 
 const DefaultPostsScreen = ({ navigation }) => {
-  const allPosts = useSelector((state) => state.posts.allItems);
-  const isLoading = useSelector((state) => state.posts.isLoading);
+  const { allItems: allPosts, isLoading } = useSelector((state) => state.posts);
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(fetchAllPosts());
   }, []);

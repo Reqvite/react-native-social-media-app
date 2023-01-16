@@ -1,6 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect } from "react";
-
 import {
   ImageBackground,
   Image,
@@ -18,12 +17,12 @@ import { authSignOutUser } from "../../redux/auth/authOperations";
 import { fetchPosts } from "../../redux/posts/postsOperations";
 
 const ProfileScreen = ({ navigation }) => {
-  const userName = useSelector((state) => state.auth.nickname);
-  const posts = useSelector((state) => state.posts.items);
-  const allPosts = useSelector((state) => state.posts.allItems);
-  const userId = useSelector((state) => state.auth.userId);
-  const profilePhoto = useSelector((state) => state.auth.userPhoto);
-  const isLoading = useSelector((state) => state.posts.isLoading);
+  const { nickname, userPhoto, userId } = useSelector((state) => state.auth);
+  const {
+    items: posts,
+    allItems: allPosts,
+    isLoading,
+  } = useSelector((state) => state.posts);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -46,7 +45,7 @@ const ProfileScreen = ({ navigation }) => {
       >
         <View style={styles.profileBox}>
           <View style={styles.photoBox}>
-            <Image style={styles.profilePhoto} source={{ uri: profilePhoto }} />
+            <Image style={styles.profilePhoto} source={{ uri: userPhoto }} />
           </View>
           <TouchableOpacity
             activeOpacity={0.8}
@@ -60,7 +59,7 @@ const ProfileScreen = ({ navigation }) => {
               color="#BDBDBD"
             />
           </TouchableOpacity>
-          <Text style={styles.name}>{userName}</Text>
+          <Text style={styles.name}>{nickname}</Text>
           {isLoading && (
             <ActivityIndicator
               style={styles.loader}
@@ -80,6 +79,7 @@ const ProfileScreen = ({ navigation }) => {
                   marginTop: 10,
                   marginBottom: 160,
                 }}
+                showsVerticalScrollIndicator={false}
               />
             </SafeAreaView>
           )}
@@ -140,8 +140,8 @@ const styles = StyleSheet.create({
   },
   loader: {
     position: "absolute",
-    left: "60%",
-    top: 90,
+    left: 10,
+    top: 22,
   },
 });
 

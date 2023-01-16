@@ -1,9 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-
 const MapScreen = ({ route }) => {
-  console.log(route);
   return (
     <View style={styles.container}>
       <View style={styles.topBox} />

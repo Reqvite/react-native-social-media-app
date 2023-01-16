@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-
 import {
   ImageBackground,
   StyleSheet,
@@ -15,19 +14,17 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-
 import uuid from "react-native-uuid";
 import * as MediaLibrary from "expo-media-library";
-
-import { useDispatch } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
-import { authSignUpUser } from "../../redux/auth/authOperations";
+import { useDispatch } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import { authSignUpUser } from "../../redux/auth/authOperations";
 
 const initialState = {
   nickname: "",
@@ -58,9 +55,7 @@ export default function RegistrationScreen({ navigation }) {
         await MediaLibrary.requestPermissionsAsync();
       setHasMediaLibraryPermission(mediaLibraryPermission.status === "granted");
     })();
-  }, []);
 
-  useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -136,6 +131,7 @@ export default function RegistrationScreen({ navigation }) {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
+        keyboardVerticalOffset={-150}
       >
         <ImageBackground
           source={require("../../assets/images/Photo_BG.jpg")}
@@ -198,26 +194,24 @@ export default function RegistrationScreen({ navigation }) {
                 onBlur={() => setInputPasswordBgColor("#F8F8F8")}
                 textAlign={"center"}
               />
-              {!isKeyboardVisible && (
-                <View>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={styles.btn}
-                    onPress={handleRegistration}
-                  >
-                    <Text style={styles.btnTitle}>Sign Up</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={styles.link}
-                    onPress={() => navigation.navigate("Login")}
-                  >
-                    <Text style={styles.linkText}>
-                      Already have an account? Log in
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              <View style={styles.btnsBox}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.btn}
+                  onPress={handleRegistration}
+                >
+                  <Text style={styles.btnTitle}>Sign Up</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.link}
+                  onPress={() => navigation.navigate("Login")}
+                >
+                  <Text style={styles.linkText}>
+                    Already have an account? Log in
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </ImageBackground>
@@ -265,6 +259,9 @@ const styles = StyleSheet.create({
   form: {
     width: "100%",
     paddingHorizontal: 20,
+  },
+  btnsBox: {
+    // height: 0,
   },
   title: {
     fontFamily: "Montserrat-Bold",

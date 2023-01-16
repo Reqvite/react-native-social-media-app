@@ -1,6 +1,5 @@
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-
 import uuid from "react-native-uuid";
 import {
   View,
@@ -9,25 +8,22 @@ import {
   FlatList,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
   TextInput,
   Keyboard,
-  KeyboardAvoidingView,
   Text,
 } from "react-native";
-
-import { Comment } from "../../components/Comment";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "../../firebase/config";
+import { Comment } from "../../components/Comment";
 import {
   fetchAllPosts,
   fetchPostCommnets,
 } from "../../redux/posts/postsOperations";
 
 const CommentsScreen = ({ route }) => {
-  const user = useSelector((state) => state.auth.nickname);
-  const userId = useSelector((state) => state.auth.userId);
-  const photoURL = useSelector((state) => state.auth.userPhoto);
+  const { userId, userPhoto: photoURL } = useSelector((state) => state.auth);
   const comments = useSelector((state) => state.posts.comments);
   const dispatch = useDispatch();
   const [message, setMessage] = useState("");
@@ -35,10 +31,6 @@ const CommentsScreen = ({ route }) => {
   useEffect(() => {
     dispatch(fetchPostCommnets(route.params.id));
   }, []);
-
-  const handleKeyboard = () => {
-    Keyboard.dismiss();
-  };
 
   const sendMessage = async () => {
     const date = new Date().getTime();
@@ -65,9 +57,16 @@ const CommentsScreen = ({ route }) => {
     setMessage("");
   };
 
+  const handleKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <TouchableWithoutFeedback onPress={handleKeyboard}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
         <View style={styles.topBox} />
         <SafeAreaView style={styles.bottomBox}>
           {comments.length === 0 ? (
@@ -101,7 +100,7 @@ const CommentsScreen = ({ route }) => {
             <Feather name="send" size={24} color="white" />
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };
@@ -116,11 +115,11 @@ const styles = StyleSheet.create({
     borderBottomColor: "#BDBDBD",
   },
   bottomBox: {
-    marginHorizontal: 10,
     flex: 1,
+    marginHorizontal: 10,
   },
   commentForm: {
-    marginBottom: 15,
+    marginBottom: 20,
     marginTop: "auto",
     position: "relative",
   },
