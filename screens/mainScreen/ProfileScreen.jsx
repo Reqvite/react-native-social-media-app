@@ -122,10 +122,11 @@ const styles = StyleSheet.create({
   },
   logoutIcon: {
     marginTop: 22,
-    alignSelf: "flex-end",
+    right: 0,
+    position: "absolute",
   },
   name: {
-    marginTop: 32,
+    marginTop: 65,
     fontFamily: "Montserrat-Bold",
     fontSize: 30,
     textAlign: "center",

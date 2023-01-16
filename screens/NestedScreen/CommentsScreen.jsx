@@ -66,6 +66,7 @@ const CommentsScreen = ({ route }) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
+        keyboardVerticalOffset={70}
       >
         <View style={styles.topBox} />
         <SafeAreaView style={styles.bottomBox}>

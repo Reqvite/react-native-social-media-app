@@ -15,6 +15,7 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
   Keyboard,
   ImageBackground,
   ActivityIndicator,
@@ -220,14 +221,17 @@ const CreatPostScreen = ({ navigation }) => {
   const loaderInput = isLoading && inputLocation.length === 0;
   return (
     <TouchableWithoutFeedback onPress={handleKeyboard}>
-      <View
+      <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
       >
         <View style={styles.topBox}>
           <Text style={styles.title}>Create Post</Text>
         </View>
-        <View style={styles.bottomBox}>
+        <View
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.bottomBox}
+        >
           <View style={styles.imageLoader}>
             <ImageBackground
               style={styles.backgroundImg}
@@ -300,7 +304,7 @@ const CreatPostScreen = ({ navigation }) => {
             <AntDesign name="delete" size={24} color="black" />
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };

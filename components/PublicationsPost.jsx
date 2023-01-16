@@ -29,12 +29,14 @@ export const PublicationsPost = ({ item, navigation }) => {
   useEffect(() => {
     if (likes?.includes(userNickname)) {
       setLikeStatus("#FF6C00");
+    } else {
+      setLikeStatus("black");
     }
     const unsub = onSnapshot(doc(db, "posts", id), (doc) => {
       setPost(doc.data());
     });
     return () => unsub();
-  }, []);
+  }, [likes]);
 
   if (!likes) {
     return;

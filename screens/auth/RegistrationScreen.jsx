@@ -260,9 +260,7 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 20,
   },
-  btnsBox: {
-    // height: 0,
-  },
+  btnsBox: {},
   title: {
     fontFamily: "Montserrat-Bold",
     textAlign: "center",
