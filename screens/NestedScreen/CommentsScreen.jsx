@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import uuid from "react-native-uuid";
 import {
   View,
-  Text,
   StyleSheet,
-  Image,
   SafeAreaView,
   FlatList,
   TouchableOpacity,
@@ -14,13 +12,17 @@ import {
   TextInput,
   Keyboard,
   KeyboardAvoidingView,
+  Text,
 } from "react-native";
 
 import { Comment } from "../../components/Comment";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "../../firebase/config";
-import { fetchPostCommnets } from "../../redux/posts/postsOperations";
+import {
+  fetchAllPosts,
+  fetchPostCommnets,
+} from "../../redux/posts/postsOperations";
 
 const CommentsScreen = ({ route }) => {
   const user = useSelector((state) => state.auth.nickname);
@@ -59,6 +61,7 @@ const CommentsScreen = ({ route }) => {
       comments: comments.length + 1,
     });
     dispatch(fetchPostCommnets(route.params.id));
+    dispatch(fetchAllPosts());
     setMessage("");
   };
 
@@ -67,15 +70,21 @@ const CommentsScreen = ({ route }) => {
       <View style={styles.container}>
         <View style={styles.topBox} />
         <SafeAreaView style={styles.bottomBox}>
-          <FlatList
-            data={comments}
-            showsVerticalScrollIndicator={false}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            style={{
-              marginTop: 10,
-            }}
-          />
+          {comments.length === 0 ? (
+            <Text style={styles.error}>
+              There are no comments under this post yet.
+            </Text>
+          ) : (
+            <FlatList
+              data={comments}
+              showsVerticalScrollIndicator={false}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              style={{
+                marginTop: 10,
+              }}
+            />
+          )}
         </SafeAreaView>
         <View style={styles.commentForm}>
           <TextInput
@@ -111,7 +120,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   commentForm: {
-    marginBottom: 5,
+    marginBottom: 15,
     marginTop: "auto",
     position: "relative",
   },
@@ -136,6 +145,11 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
+  },
+  error: {
+    marginTop: 20,
+    alignSelf: "center",
+    fontFamily: "Montserrat-Bold",
   },
 });
 

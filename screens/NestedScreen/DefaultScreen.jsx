@@ -8,17 +8,17 @@ import {
   SafeAreaView,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
 import { PublicationsPost } from "../../components/PublicationsPost";
-
 import { authSignOutUser } from "../../redux/auth/authOperations";
 import { fetchAllPosts } from "../../redux/posts/postsOperations";
 
 const DefaultPostsScreen = ({ navigation }) => {
   const allPosts = useSelector((state) => state.posts.allItems);
-
+  const isLoading = useSelector((state) => state.posts.isLoading);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -48,6 +48,13 @@ const DefaultPostsScreen = ({ navigation }) => {
           <MaterialIcons name="update" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.title}>Publications</Text>
+        {isLoading && (
+          <ActivityIndicator
+            style={styles.loader}
+            size="small"
+            color="#FF6C00"
+          />
+        )}
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles.link}
@@ -92,9 +99,15 @@ const styles = StyleSheet.create({
     borderBottomColor: "#BDBDBD",
   },
   title: {
+    position: "relative",
     fontFamily: "Montserrat-Bold",
     fontSize: 17,
     marginBottom: 11,
+  },
+  loader: {
+    position: "absolute",
+    left: "70%",
+    bottom: "13%",
   },
   updateIcon: {
     marginRight: "auto",

@@ -15,12 +15,13 @@ export const fetchPosts = createAsyncThunk(
         querySnapshot.forEach((doc) => {
           posts.push(doc.data());
         });
-        return posts;
+        return posts.sort(
+          (firstPost, lastPost) => lastPost.createdAt - firstPost.createdAt
+        );
       };
       const posts = await getPosts();
       return posts;
     } catch (err) {
-      console.log(err);
       return thunkAPI.rejectWithValue(err.message);
     }
   }
@@ -43,7 +44,6 @@ export const fetchAllPosts = createAsyncThunk(
         (firstPost, lastPost) => lastPost.createdAt - firstPost.createdAt
       );
     } catch (err) {
-      console.log(err);
       return thunkAPI.rejectWithValue(err.message);
     }
   }
@@ -79,7 +79,6 @@ export const fetchPostCommnets = createAsyncThunk(
           lastComment.createdAt - firstComment.createdAt
       );
     } catch (err) {
-      console.log(err);
       return thunkAPI.rejectWithValue(err.message);
     }
   }

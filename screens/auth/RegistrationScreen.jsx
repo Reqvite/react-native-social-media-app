@@ -12,6 +12,8 @@ import {
   Keyboard,
   TouchableOpacity,
   Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import uuid from "react-native-uuid";
@@ -20,7 +22,12 @@ import * as MediaLibrary from "expo-media-library";
 import { useDispatch } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { authSignUpUser } from "../../redux/auth/authOperations";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 const initialState = {
   nickname: "",
@@ -35,7 +42,7 @@ export default function RegistrationScreen({ navigation }) {
   const [inputLoginBgColor, setInputLoginBgColor] = useState("#F8F8F8");
   const [inputEmailBgColor, setInputEmailBgColor] = useState("#F8F8F8");
   const [inputPasswordBgColor, setInputPasswordBgColor] = useState("#F8F8F8");
-
+  const [isLoading, setIsLoading] = useState(false);
   const [state, setState] = useState(initialState);
   const [profilePhoto, setProfilePhoto] = useState(
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
@@ -84,31 +91,44 @@ export default function RegistrationScreen({ navigation }) {
 
   const pickImage = async () => {
     try {
-      let result = await ImagePicker.launchImageLibraryAsync({
+      setIsLoading(true);
+      const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
       });
 
-      const photoLink = await uploadPhotoToServer(result.assets[0].uri);
-      console.log(photoLink);
-      setProfilePhoto(photoLink);
-      setState((prevState) => ({ ...prevState, userPhoto: photoLink }));
+      if (!result.canceled) {
+        const photoLink = await uploadPhotoToServer(result.assets[0].uri);
+        setProfilePhoto(photoLink);
+        setState((prevState) => ({
+          ...prevState,
+          userPhoto: photoLink,
+        }));
+      }
+      setIsLoading(false);
     } catch (error) {
-      console.log(error.message);
+      Alert.alert(error.message);
+      setIsLoading(false);
+      return;
     }
   };
 
   const uploadPhotoToServer = async (photo) => {
-    const storage = getStorage();
-    const id = uuid.v4();
-    const storageRef = ref(storage, `images/${id}`);
-    const resp = await fetch(photo);
-    const file = await resp.blob();
-    await uploadBytes(storageRef, file);
-    const link = await getDownloadURL(ref(storage, `images/${id}`));
-    return link;
+    try {
+      const storage = getStorage();
+      const id = uuid.v4();
+      const storageRef = ref(storage, `images/${id}`);
+      const resp = await fetch(photo);
+      const file = await resp.blob();
+      await uploadBytesResumable(storageRef, file);
+      const link = await getDownloadURL(ref(storage, `images/${id}`));
+      return link;
+    } catch (error) {
+      Alert.alert(error.message);
+      return;
+    }
   };
 
   return (
@@ -132,6 +152,13 @@ export default function RegistrationScreen({ navigation }) {
                 style={styles.addPhotoBtn}
                 onPress={pickImage}
               >
+                {isLoading && (
+                  <ActivityIndicator
+                    style={styles.loader}
+                    size="small"
+                    color="#FF6C00"
+                  />
+                )}
                 <Ionicons name="add-circle-outline" size={30} color="#FF6C00" />
               </TouchableOpacity>
             </View>
@@ -285,5 +312,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#1B4371",
     fontSize: 18,
+  },
+  loader: {
+    position: "absolute",
+    left: -54,
+    bottom: 40,
   },
 });

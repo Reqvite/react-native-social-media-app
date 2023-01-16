@@ -24,6 +24,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ImageBackground,
+  ActivityIndicator,
 } from "react-native";
 
 import { useEffect, useRef, useState } from "react";
@@ -36,6 +37,7 @@ const CreatPostScreen = ({ navigation }) => {
   const user = useSelector((state) => state.auth.nickname);
   const userId = useSelector((state) => state.auth.userId);
   const userPhoto = useSelector((state) => state.auth.userPhoto);
+  const [isLoading, setIsLoading] = useState(false);
   let cameraRef = useRef(null);
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
@@ -120,6 +122,7 @@ const CreatPostScreen = ({ navigation }) => {
     };
 
     const setNewPostPhoto = async () => {
+      setIsLoading(true);
       setPostPhoto(photo.uri);
       setPhoto(undefined);
       let location = await Location.getCurrentPositionAsync({});
@@ -135,6 +138,7 @@ const CreatPostScreen = ({ navigation }) => {
 
       let fullLocation = `${geoCode[0].city},${geoCode[0].country}`;
       setInputLocation(fullLocation);
+      setIsLoading(false);
     };
 
     const savePhoto = () => {
@@ -174,12 +178,11 @@ const CreatPostScreen = ({ navigation }) => {
       title.length !== 0 &&
       inputLocation.length !== 0
     ) {
+      setIsLoading(true);
       let address = await Location.geocodeAsync(inputLocation);
 
       let latitude = address[0]?.latitude;
       let longitude = address[0]?.longitude;
-
-      navigation.navigate("Publications");
 
       const id = uuid.v4();
       const photoLink = await uploadPhotoToServer(postPhoto);
@@ -205,6 +208,8 @@ const CreatPostScreen = ({ navigation }) => {
       dispatch(addPost(newPost));
       dispatch(fetchAllPosts());
       clearPost();
+      setIsLoading(false);
+      navigation.navigate("Publications");
     }
 
     return;
@@ -230,7 +235,7 @@ const CreatPostScreen = ({ navigation }) => {
     );
     setButtonBgColorBgColor("#F8F8F8");
   };
-
+  const loaderInput = isLoading && inputLocation.length === 0;
   return (
     <TouchableWithoutFeedback onPress={handleKeyboard}>
       <View
@@ -276,13 +281,29 @@ const CreatPostScreen = ({ navigation }) => {
                 value={inputLocation}
                 onChangeText={(text) => setInputLocation(text)}
               />
+              {loaderInput && (
+                <ActivityIndicator
+                  style={styles.loactionLoader}
+                  size="small"
+                  color="#FF6C00"
+                />
+              )}
             </View>
             <TouchableOpacity
               activeOpacity={0.8}
               style={[styles.btn, { backgroundColor: buttonBgColor }]}
               onPress={sendPhoto}
             >
-              <Text style={styles.btnTitle}>Publish</Text>
+              <Text style={styles.btnTitle}>
+                {isLoading &&
+                postPhoto.length !== 0 &&
+                title.length !== 0 &&
+                inputLocation.length !== 0 ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  "Publish"
+                )}
+              </Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity
@@ -328,7 +349,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 8,
   },
-  backgroundImg: {},
   camera: {
     position: "relative",
     width: "100%",
@@ -405,6 +425,11 @@ const styles = StyleSheet.create({
         borderColor: "transparent",
       },
     }),
+  },
+  loactionLoader: {
+    position: "absolute",
+    bottom: "20%",
+    left: "28%",
   },
 });
 

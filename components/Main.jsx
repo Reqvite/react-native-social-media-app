@@ -8,16 +8,27 @@ import { StyleSheet, Text, ActivityIndicator } from "react-native";
 
 const Main = () => {
   const { stateChange } = useSelector((state) => state.auth);
+  const { userId } = useSelector((state) => state.auth);
+  const [loader, setLoader] = useState(false);
   const dispatch = useDispatch();
 
   const routing = useRoute(stateChange);
 
   useEffect(() => {
+    setTimeout(() => {
+      setLoader(true);
+    }, 500);
     dispatch(authStateChangeUser());
   }, []);
 
-  return !stateChange ? (
-    <ActivityIndicator size="large" />
+  return !loader ? (
+    <ActivityIndicator
+      size="large"
+      color="#FF6C00"
+      style={{
+        marginTop: "100%",
+      }}
+    />
   ) : (
     <NavigationContainer>{routing}</NavigationContainer>
   );

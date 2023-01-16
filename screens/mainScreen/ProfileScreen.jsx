@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { PublicationsPost } from "../../components/PublicationsPost";
@@ -22,6 +23,7 @@ const ProfileScreen = ({ navigation }) => {
   const allPosts = useSelector((state) => state.posts.allItems);
   const userId = useSelector((state) => state.auth.userId);
   const profilePhoto = useSelector((state) => state.auth.userPhoto);
+  const isLoading = useSelector((state) => state.posts.isLoading);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -59,6 +61,13 @@ const ProfileScreen = ({ navigation }) => {
             />
           </TouchableOpacity>
           <Text style={styles.name}>{userName}</Text>
+          {isLoading && (
+            <ActivityIndicator
+              style={styles.loader}
+              size="small"
+              color="#FF6C00"
+            />
+          )}
           {posts.length === 0 ? (
             <Text style={styles.error}>You don't have any posts yet.</Text>
           ) : (
@@ -128,6 +137,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignSelf: "center",
     fontFamily: "Montserrat-Bold",
+  },
+  loader: {
+    position: "absolute",
+    left: "60%",
+    top: 90,
   },
 });
 

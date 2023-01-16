@@ -24,7 +24,7 @@ export const CameraOptions = ({
         style={styles.btn}
         onPress={setNewPostPhoto}
       >
-        <Text style={styles.btnTitle}>Set Photo</Text>
+        <Text style={styles.btnTitle}>Download photo</Text>
       </TouchableOpacity>
       <TouchableOpacity
         activeOpacity={0.8}
@@ -84,6 +84,6 @@ const styles = StyleSheet.create({
   preview: {
     borderRadius: 20,
     width: "100%",
-    height: 500,
+    height: "70%",
   },
 });

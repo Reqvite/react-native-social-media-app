@@ -2,13 +2,15 @@ import { EvilIcons } from "@expo/vector-icons";
 
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchAllPosts } from "../redux/posts/postsOperations";
 import { useEffect, useState } from "react";
 
 export const PublicationsPost = ({ item, navigation }) => {
+  const userNickname = useSelector((state) => state.auth.nickname);
+  const [post, setPost] = useState(null);
   const dispatch = useDispatch();
   const [likeStatus, setLikeStatus] = useState("black");
 
@@ -25,15 +27,23 @@ export const PublicationsPost = ({ item, navigation }) => {
   } = item;
 
   useEffect(() => {
-    if (likes.includes(nickname)) {
+    if (likes?.includes(userNickname)) {
       setLikeStatus("#FF6C00");
     }
+    const unsub = onSnapshot(doc(db, "posts", id), (doc) => {
+      setPost(doc.data());
+    });
+    return () => unsub();
   }, []);
+
+  if (!likes) {
+    return;
+  }
 
   const postRef = doc(db, "posts", id);
   const like = async () => {
-    if (likes.includes(nickname)) {
-      const filteredLikes = likes.filter((like) => like !== nickname);
+    if (post.likes.includes(userNickname)) {
+      const filteredLikes = post.likes.filter((like) => like !== userNickname);
       await updateDoc(postRef, {
         likes: filteredLikes,
       });
@@ -41,7 +51,7 @@ export const PublicationsPost = ({ item, navigation }) => {
       dispatch(fetchAllPosts());
     } else {
       await updateDoc(postRef, {
-        likes: [...likes, nickname],
+        likes: [...post.likes, userNickname],
       });
       setLikeStatus("#FF6C00");
       dispatch(fetchAllPosts());
